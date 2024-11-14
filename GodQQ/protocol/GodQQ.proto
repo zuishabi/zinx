@@ -1,0 +1,60 @@
+syntax="proto3";
+
+option go_package = "/msg";
+
+message ErrToClient{
+  bool succ = 1;
+  string errorMsg = 2;
+  oneof info{
+    uint32 uid = 3;
+  }
+}
+
+//当用户上线或下线时进行广播，注册到客户端在线列表中
+message OnOrOffLineMsg{
+  uint32 uid = 1;
+  string user_name = 2;
+  bool type = 3;
+}
+
+message LoginFromClient{
+  string user_email = 1;
+  string user_pwd = 2;
+}
+
+//需要发送的消息
+message MessageToClient{
+  uint32 uid = 1;//发送者的uid
+  uint32 target_uid = 2;//如果是私聊消息，那么发送目标的uid
+  string msg = 3;//发送的信息
+  string time = 4;//发送的时间
+}
+
+//由客户端发送的消息
+message MessageFromClient{
+  uint32 uid = 1;//如果是私聊消息，那么需要发送的uid
+  string content = 2;//发送的内容
+  uint32 type = 3;//消息的类型，1则是广播消息，2则是私聊消息
+}
+
+message Register{
+  string user_name = 1;
+  string user_pwd = 2;
+  string user_email = 3;
+  string code = 4;
+}
+
+//由客户端进行查询，服务器返回查询结果
+message Inquiry{
+  uint32 type = 1;//进行查询的类型,1为查询所有在线用户，2为查询给定uid的用户是否在线
+  oneof info{
+    uint32 uid = 2;//查询对应uid的用户
+  }
+  bool result = 3;//返回的查询结果
+}
+
+//向客户端发送所有在线的用户
+message OnlineUsers{
+  repeated uint32 uid = 1;//用户的uid列表
+  repeated string name = 2;//用户的昵称
+}
