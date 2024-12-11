@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"strings"
 	"zinx/GodQQ/goMail"
+	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
 	"zinx/GodQQ/redisQQ"
 	"zinx/ziface"
@@ -40,12 +41,10 @@ func (g *GenerateCaptchaRouter) Handle(request ziface.IRequest) {
 	//	return
 	//}
 	//检查邮件地址是否已经被注册
-	reply, err := redisConn.Do("get", emailAddress)
-	if err != nil {
-		fmt.Println("redis获取邮箱失败", err)
-		return
-	}
-	if reply != nil {
+	user := mysqlQQ.UserInfo{}
+	mysqlQQ.Db.Where("user_email = ?", emailAddress).First(&user)
+	if user.UID != 0 {
+		//邮箱已经被注册
 		sendErrMsg("邮箱已被注册", false, request.GetConnection())
 		return
 	}

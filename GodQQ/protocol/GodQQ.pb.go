@@ -230,8 +230,14 @@ type MessageToClient struct {
 
 	Uid       uint32 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                              //发送者的uid
 	TargetUid uint32 `protobuf:"varint,2,opt,name=target_uid,json=targetUid,proto3" json:"target_uid,omitempty"` //如果是私聊消息，那么发送目标的uid
-	Msg       string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`                               //发送的信息
-	Time      string `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty"`                             //发送的时间
+	// Types that are assignable to Msg:
+	//
+	//	*MessageToClient_Text
+	//	*MessageToClient_Data
+	//	*MessageToClient_Texture
+	Msg     isMessageToClient_Msg `protobuf_oneof:"msg"`
+	Time    string                `protobuf:"bytes,6,opt,name=time,proto3" json:"time,omitempty"`                       //发送的时间
+	MsgType uint32                `protobuf:"varint,7,opt,name=msg_type,json=msgType,proto3" json:"msg_type,omitempty"` //发送的类型，1为文字消息，2为语音消息
 }
 
 func (x *MessageToClient) Reset() {
@@ -280,11 +286,32 @@ func (x *MessageToClient) GetTargetUid() uint32 {
 	return 0
 }
 
-func (x *MessageToClient) GetMsg() string {
-	if x != nil {
-		return x.Msg
+func (m *MessageToClient) GetMsg() isMessageToClient_Msg {
+	if m != nil {
+		return m.Msg
+	}
+	return nil
+}
+
+func (x *MessageToClient) GetText() string {
+	if x, ok := x.GetMsg().(*MessageToClient_Text); ok {
+		return x.Text
 	}
 	return ""
+}
+
+func (x *MessageToClient) GetData() []byte {
+	if x, ok := x.GetMsg().(*MessageToClient_Data); ok {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *MessageToClient) GetTexture() *TextureMsg {
+	if x, ok := x.GetMsg().(*MessageToClient_Texture); ok {
+		return x.Texture
+	}
+	return nil
 }
 
 func (x *MessageToClient) GetTime() string {
@@ -294,15 +321,49 @@ func (x *MessageToClient) GetTime() string {
 	return ""
 }
 
+func (x *MessageToClient) GetMsgType() uint32 {
+	if x != nil {
+		return x.MsgType
+	}
+	return 0
+}
+
+type isMessageToClient_Msg interface {
+	isMessageToClient_Msg()
+}
+
+type MessageToClient_Text struct {
+	Text string `protobuf:"bytes,3,opt,name=text,proto3,oneof"`
+}
+
+type MessageToClient_Data struct {
+	Data []byte `protobuf:"bytes,4,opt,name=data,proto3,oneof"`
+}
+
+type MessageToClient_Texture struct {
+	Texture *TextureMsg `protobuf:"bytes,5,opt,name=texture,proto3,oneof"`
+}
+
+func (*MessageToClient_Text) isMessageToClient_Msg() {}
+
+func (*MessageToClient_Data) isMessageToClient_Msg() {}
+
+func (*MessageToClient_Texture) isMessageToClient_Msg() {}
+
 // 由客户端发送的消息
 type MessageFromClient struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid     uint32 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`        //如果是私聊消息，那么需要发送的uid
-	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` //发送的内容
-	Type    uint32 `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`      //消息的类型，1则是广播消息，2则是私聊消息
+	Uid     uint32 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                        //如果是私聊消息，那么需要发送的uid
+	MsgType uint32 `protobuf:"varint,2,opt,name=msg_type,json=msgType,proto3" json:"msg_type,omitempty"` //发送的类型
+	// Types that are assignable to Content:
+	//
+	//	*MessageFromClient_Text
+	//	*MessageFromClient_Data
+	//	*MessageFromClient_Texture
+	Content isMessageFromClient_Content `protobuf_oneof:"content"`
 }
 
 func (x *MessageFromClient) Reset() {
@@ -344,16 +405,130 @@ func (x *MessageFromClient) GetUid() uint32 {
 	return 0
 }
 
-func (x *MessageFromClient) GetContent() string {
+func (x *MessageFromClient) GetMsgType() uint32 {
 	if x != nil {
-		return x.Content
+		return x.MsgType
+	}
+	return 0
+}
+
+func (m *MessageFromClient) GetContent() isMessageFromClient_Content {
+	if m != nil {
+		return m.Content
+	}
+	return nil
+}
+
+func (x *MessageFromClient) GetText() string {
+	if x, ok := x.GetContent().(*MessageFromClient_Text); ok {
+		return x.Text
 	}
 	return ""
 }
 
-func (x *MessageFromClient) GetType() uint32 {
+func (x *MessageFromClient) GetData() []byte {
+	if x, ok := x.GetContent().(*MessageFromClient_Data); ok {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *MessageFromClient) GetTexture() *TextureMsg {
+	if x, ok := x.GetContent().(*MessageFromClient_Texture); ok {
+		return x.Texture
+	}
+	return nil
+}
+
+type isMessageFromClient_Content interface {
+	isMessageFromClient_Content()
+}
+
+type MessageFromClient_Text struct {
+	Text string `protobuf:"bytes,3,opt,name=text,proto3,oneof"`
+}
+
+type MessageFromClient_Data struct {
+	Data []byte `protobuf:"bytes,4,opt,name=data,proto3,oneof"`
+}
+
+type MessageFromClient_Texture struct {
+	Texture *TextureMsg `protobuf:"bytes,5,opt,name=texture,proto3,oneof"` //图片数据
+}
+
+func (*MessageFromClient_Text) isMessageFromClient_Content() {}
+
+func (*MessageFromClient_Data) isMessageFromClient_Content() {}
+
+func (*MessageFromClient_Texture) isMessageFromClient_Content() {}
+
+type TextureMsg struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Width  uint32 `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`
+	Height uint32 `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
+	Data   []byte `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	Format uint32 `protobuf:"varint,4,opt,name=format,proto3" json:"format,omitempty"` //texture的类型
+}
+
+func (x *TextureMsg) Reset() {
+	*x = TextureMsg{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TextureMsg) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TextureMsg) ProtoMessage() {}
+
+func (x *TextureMsg) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TextureMsg.ProtoReflect.Descriptor instead.
+func (*TextureMsg) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TextureMsg) GetWidth() uint32 {
 	if x != nil {
-		return x.Type
+		return x.Width
+	}
+	return 0
+}
+
+func (x *TextureMsg) GetHeight() uint32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
+}
+
+func (x *TextureMsg) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *TextureMsg) GetFormat() uint32 {
+	if x != nil {
+		return x.Format
 	}
 	return 0
 }
@@ -372,7 +547,7 @@ type Register struct {
 func (x *Register) Reset() {
 	*x = Register{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[5]
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -385,7 +560,7 @@ func (x *Register) String() string {
 func (*Register) ProtoMessage() {}
 
 func (x *Register) ProtoReflect() protoreflect.Message {
-	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[5]
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -398,7 +573,7 @@ func (x *Register) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Register.ProtoReflect.Descriptor instead.
 func (*Register) Descriptor() ([]byte, []int) {
-	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{5}
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Register) GetUserName() string {
@@ -429,98 +604,14 @@ func (x *Register) GetCode() string {
 	return ""
 }
 
-// 由客户端进行查询，服务器返回查询结果
-type Inquiry struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Type uint32 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"` //进行查询的类型,1为查询所有在线用户，2为查询给定uid的用户是否在线
-	// Types that are assignable to Info:
-	//
-	//	*Inquiry_Uid
-	Info   isInquiry_Info `protobuf_oneof:"info"`
-	Result bool           `protobuf:"varint,3,opt,name=result,proto3" json:"result,omitempty"` //返回的查询结果
-}
-
-func (x *Inquiry) Reset() {
-	*x = Inquiry{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Inquiry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Inquiry) ProtoMessage() {}
-
-func (x *Inquiry) ProtoReflect() protoreflect.Message {
-	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Inquiry.ProtoReflect.Descriptor instead.
-func (*Inquiry) Descriptor() ([]byte, []int) {
-	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *Inquiry) GetType() uint32 {
-	if x != nil {
-		return x.Type
-	}
-	return 0
-}
-
-func (m *Inquiry) GetInfo() isInquiry_Info {
-	if m != nil {
-		return m.Info
-	}
-	return nil
-}
-
-func (x *Inquiry) GetUid() uint32 {
-	if x, ok := x.GetInfo().(*Inquiry_Uid); ok {
-		return x.Uid
-	}
-	return 0
-}
-
-func (x *Inquiry) GetResult() bool {
-	if x != nil {
-		return x.Result
-	}
-	return false
-}
-
-type isInquiry_Info interface {
-	isInquiry_Info()
-}
-
-type Inquiry_Uid struct {
-	Uid uint32 `protobuf:"varint,2,opt,name=uid,proto3,oneof"` //查询对应uid的用户
-}
-
-func (*Inquiry_Uid) isInquiry_Info() {}
-
 // 向客户端发送所有在线的用户
 type OnlineUsers struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid  []uint32 `protobuf:"varint,1,rep,packed,name=uid,proto3" json:"uid,omitempty"` //用户的uid列表
-	Name []string `protobuf:"bytes,2,rep,name=name,proto3" json:"name,omitempty"`       //用户的昵称
+	Uid      []uint32 `protobuf:"varint,1,rep,packed,name=uid,proto3" json:"uid,omitempty"`                   //用户的uid列表
+	UserName []string `protobuf:"bytes,2,rep,name=user_name,json=userName,proto3" json:"user_name,omitempty"` //用户名
 }
 
 func (x *OnlineUsers) Reset() {
@@ -562,11 +653,683 @@ func (x *OnlineUsers) GetUid() []uint32 {
 	return nil
 }
 
-func (x *OnlineUsers) GetName() []string {
+func (x *OnlineUsers) GetUserName() []string {
 	if x != nil {
-		return x.Name
+		return x.UserName
 	}
 	return nil
+}
+
+// 客户端向服务端发送的请求分享的页码
+type GetShare struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Page uint32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"` //查询的页码数
+	Type uint32 `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"` //查询的类型，1为全局查询，2为查询自己发的share
+}
+
+func (x *GetShare) Reset() {
+	*x = GetShare{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetShare) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetShare) ProtoMessage() {}
+
+func (x *GetShare) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetShare.ProtoReflect.Descriptor instead.
+func (*GetShare) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetShare) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetShare) GetType() uint32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+// 客户端向服务端进行创建share
+type CreateShare struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId  uint32 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` //发表者的id
+	Content string `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`              //发表的内容
+}
+
+func (x *CreateShare) Reset() {
+	*x = CreateShare{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateShare) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateShare) ProtoMessage() {}
+
+func (x *CreateShare) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateShare.ProtoReflect.Descriptor instead.
+func (*CreateShare) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CreateShare) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *CreateShare) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+// 服务器向客户端发送的share
+type SendShare struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IsTheEnd  bool     `protobuf:"varint,8,opt,name=is_the_end,json=isTheEnd,proto3" json:"is_the_end,omitempty"`         //判断是否是表中最后一个元素
+	Type      uint32   `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`                                   //发送的类型，1为全局，2为自身查询
+	HideIndex []uint32 `protobuf:"varint,2,rep,packed,name=hide_index,json=hideIndex,proto3" json:"hide_index,omitempty"` //如果数据长度大于200，发送省略数据，将省略的参数放到此列中
+	Id        []uint64 `protobuf:"varint,3,rep,packed,name=id,proto3" json:"id,omitempty"`                                //显示当前share的id
+	UserId    []uint32 `protobuf:"varint,4,rep,packed,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Content   []string `protobuf:"bytes,6,rep,name=content,proto3" json:"content,omitempty"`
+	Time      []string `protobuf:"bytes,7,rep,name=time,proto3" json:"time,omitempty"` //创建的时间
+}
+
+func (x *SendShare) Reset() {
+	*x = SendShare{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SendShare) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendShare) ProtoMessage() {}
+
+func (x *SendShare) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendShare.ProtoReflect.Descriptor instead.
+func (*SendShare) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *SendShare) GetIsTheEnd() bool {
+	if x != nil {
+		return x.IsTheEnd
+	}
+	return false
+}
+
+func (x *SendShare) GetType() uint32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *SendShare) GetHideIndex() []uint32 {
+	if x != nil {
+		return x.HideIndex
+	}
+	return nil
+}
+
+func (x *SendShare) GetId() []uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *SendShare) GetUserId() []uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return nil
+}
+
+func (x *SendShare) GetContent() []string {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *SendShare) GetTime() []string {
+	if x != nil {
+		return x.Time
+	}
+	return nil
+}
+
+// 客户端向服务器创建评论
+type CreateComment struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ShareId   uint64 `protobuf:"varint,1,opt,name=share_id,json=shareId,proto3" json:"share_id,omitempty"`
+	TargetUid uint32 `protobuf:"varint,2,opt,name=target_uid,json=targetUid,proto3" json:"target_uid,omitempty"` //向谁进行评论，0为share
+	Content   string `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                       //创建的评论内容
+}
+
+func (x *CreateComment) Reset() {
+	*x = CreateComment{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateComment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateComment) ProtoMessage() {}
+
+func (x *CreateComment) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateComment.ProtoReflect.Descriptor instead.
+func (*CreateComment) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateComment) GetShareId() uint64 {
+	if x != nil {
+		return x.ShareId
+	}
+	return 0
+}
+
+func (x *CreateComment) GetTargetUid() uint32 {
+	if x != nil {
+		return x.TargetUid
+	}
+	return 0
+}
+
+func (x *CreateComment) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+// 客户端向服务器申请获得内容详情
+type GetShareDetail struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id          uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UpdatedTime string `protobuf:"bytes,2,opt,name=updated_time,json=updatedTime,proto3" json:"updated_time,omitempty"` //客户端向服务端发送收到的share的updated时间，如果和服务器获得的时间不同，则需要重新向客户端发送更新后的数据
+	IsHidden    bool   `protobuf:"varint,3,opt,name=is_hidden,json=isHidden,proto3" json:"is_hidden,omitempty"`         //判断客户端获得的share是否是隐藏过的
+}
+
+func (x *GetShareDetail) Reset() {
+	*x = GetShareDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetShareDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetShareDetail) ProtoMessage() {}
+
+func (x *GetShareDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetShareDetail.ProtoReflect.Descriptor instead.
+func (*GetShareDetail) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetShareDetail) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *GetShareDetail) GetUpdatedTime() string {
+	if x != nil {
+		return x.UpdatedTime
+	}
+	return ""
+}
+
+func (x *GetShareDetail) GetIsHidden() bool {
+	if x != nil {
+		return x.IsHidden
+	}
+	return false
+}
+
+type SendShareDetail struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Exist   bool   `protobuf:"varint,1,opt,name=exist,proto3" json:"exist,omitempty"`
+	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *SendShareDetail) Reset() {
+	*x = SendShareDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SendShareDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendShareDetail) ProtoMessage() {}
+
+func (x *SendShareDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendShareDetail.ProtoReflect.Descriptor instead.
+func (*SendShareDetail) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SendShareDetail) GetExist() bool {
+	if x != nil {
+		return x.Exist
+	}
+	return false
+}
+
+func (x *SendShareDetail) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+// 客户端向服务器申请获得评论
+type GetComment struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id   uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Page uint64 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"` //获得评论的位置
+}
+
+func (x *GetComment) Reset() {
+	*x = GetComment{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetComment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComment) ProtoMessage() {}
+
+func (x *GetComment) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComment.ProtoReflect.Descriptor instead.
+func (*GetComment) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetComment) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *GetComment) GetPage() uint64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+// 向客户端发送评论
+type SendComment struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id          uint64   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                       //share的id，用来防止传错
+	UserId      []uint32 `protobuf:"varint,2,rep,packed,name=user_id,json=userId,proto3" json:"user_id,omitempty"`          //评论的用户id
+	Comment     []string `protobuf:"bytes,3,rep,name=comment,proto3" json:"comment,omitempty"`                              //用户的评论
+	CommentTime []string `protobuf:"bytes,4,rep,name=comment_time,json=commentTime,proto3" json:"comment_time,omitempty"`   //评论的时间
+	CommentId   []uint64 `protobuf:"varint,5,rep,packed,name=comment_id,json=commentId,proto3" json:"comment_id,omitempty"` //评论的id
+	IsTheEnd    bool     `protobuf:"varint,6,opt,name=is_the_end,json=isTheEnd,proto3" json:"is_the_end,omitempty"`         //判断是否是最后一个
+}
+
+func (x *SendComment) Reset() {
+	*x = SendComment{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SendComment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendComment) ProtoMessage() {}
+
+func (x *SendComment) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendComment.ProtoReflect.Descriptor instead.
+func (*SendComment) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *SendComment) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SendComment) GetUserId() []uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return nil
+}
+
+func (x *SendComment) GetComment() []string {
+	if x != nil {
+		return x.Comment
+	}
+	return nil
+}
+
+func (x *SendComment) GetCommentTime() []string {
+	if x != nil {
+		return x.CommentTime
+	}
+	return nil
+}
+
+func (x *SendComment) GetCommentId() []uint64 {
+	if x != nil {
+		return x.CommentId
+	}
+	return nil
+}
+
+func (x *SendComment) GetIsTheEnd() bool {
+	if x != nil {
+		return x.IsTheEnd
+	}
+	return false
+}
+
+// 客户端向服务器发送一个id和名称来向服务器确认是否更换,如果没有更换则返回空
+type InquiryUser struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId   uint32 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserName string `protobuf:"bytes,2,opt,name=user_name,json=userName,proto3" json:"user_name,omitempty"`
+}
+
+func (x *InquiryUser) Reset() {
+	*x = InquiryUser{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *InquiryUser) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InquiryUser) ProtoMessage() {}
+
+func (x *InquiryUser) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InquiryUser.ProtoReflect.Descriptor instead.
+func (*InquiryUser) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *InquiryUser) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *InquiryUser) GetUserName() string {
+	if x != nil {
+		return x.UserName
+	}
+	return ""
+}
+
+// 查询或者设置一个内容的like
+type Liking struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId    uint32 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ContentId uint64 `protobuf:"varint,2,opt,name=content_id,json=contentId,proto3" json:"content_id,omitempty"`
+	// 当类型为1时是查询一个share的like，当类型为2时是设置一个share的like，当类型为3时是查询一个share的评论的like，当类型是4时是设置一个share的评论的like
+	ContentType uint32 `protobuf:"varint,3,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	Result      bool   `protobuf:"varint,4,opt,name=result,proto3" json:"result,omitempty"` //返回的值或者设置的值
+	Counts      uint32 `protobuf:"varint,5,opt,name=counts,proto3" json:"counts,omitempty"` //返回点赞的数量
+}
+
+func (x *Liking) Reset() {
+	*x = Liking{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Liking) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Liking) ProtoMessage() {}
+
+func (x *Liking) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Liking.ProtoReflect.Descriptor instead.
+func (*Liking) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *Liking) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *Liking) GetContentId() uint64 {
+	if x != nil {
+		return x.ContentId
+	}
+	return 0
+}
+
+func (x *Liking) GetContentType() uint32 {
+	if x != nil {
+		return x.ContentType
+	}
+	return 0
+}
+
+func (x *Liking) GetResult() bool {
+	if x != nil {
+		return x.Result
+	}
+	return false
+}
+
+func (x *Liking) GetCounts() uint32 {
+	if x != nil {
+		return x.Counts
+	}
+	return 0
 }
 
 var File_GodQQ_protocol_GodQQ_proto protoreflect.FileDescriptor
@@ -589,36 +1352,112 @@ var file_GodQQ_protocol_GodQQ_proto_rawDesc = []byte{
 	0x1d, 0x0a, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x09, 0x75, 0x73, 0x65, 0x72, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x19,
 	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x70, 0x77, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x50, 0x77, 0x64, 0x22, 0x68, 0x0a, 0x0f, 0x4d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x10, 0x0a, 0x03,
-	0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x1d,
-	0x0a, 0x0a, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x5f, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x0d, 0x52, 0x09, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x55, 0x69, 0x64, 0x12, 0x10, 0x0a,
-	0x03, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x12,
-	0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74,
-	0x69, 0x6d, 0x65, 0x22, 0x53, 0x0a, 0x11, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x46, 0x72,
-	0x6f, 0x6d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f,
-	0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e,
-	0x74, 0x65, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x0d, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x75, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x65, 0x72, 0x12, 0x1b, 0x0a, 0x09, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d,
-	0x65, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x70, 0x77, 0x64, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x50, 0x77, 0x64, 0x12, 0x1d, 0x0a, 0x0a,
-	0x75, 0x73, 0x65, 0x72, 0x5f, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x09, 0x75, 0x73, 0x65, 0x72, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x63,
-	0x6f, 0x64, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22,
-	0x51, 0x0a, 0x07, 0x49, 0x6e, 0x71, 0x75, 0x69, 0x72, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79,
-	0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x12,
-	0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x48, 0x00, 0x52, 0x03, 0x75,
-	0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x08, 0x52, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x42, 0x06, 0x0a, 0x04, 0x69, 0x6e,
-	0x66, 0x6f, 0x22, 0x33, 0x0a, 0x0b, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72,
-	0x73, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0d, 0x52, 0x03,
-	0x75, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x03, 0x28,
-	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x42, 0x06, 0x5a, 0x04, 0x2f, 0x6d, 0x73, 0x67, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x50, 0x77, 0x64, 0x22, 0xcd, 0x01, 0x0a, 0x0f, 0x4d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x10, 0x0a,
+	0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12,
+	0x1d, 0x0a, 0x0a, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x5f, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x09, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x55, 0x69, 0x64, 0x12, 0x14,
+	0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x04,
+	0x74, 0x65, 0x78, 0x74, 0x12, 0x14, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x0c, 0x48, 0x00, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x27, 0x0a, 0x07, 0x74, 0x65,
+	0x78, 0x74, 0x75, 0x72, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x54, 0x65,
+	0x78, 0x74, 0x75, 0x72, 0x65, 0x4d, 0x73, 0x67, 0x48, 0x00, 0x52, 0x07, 0x74, 0x65, 0x78, 0x74,
+	0x75, 0x72, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x12, 0x19, 0x0a, 0x08, 0x6d, 0x73, 0x67, 0x5f, 0x74,
+	0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x07, 0x6d, 0x73, 0x67, 0x54, 0x79,
+	0x70, 0x65, 0x42, 0x05, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x22, 0xa0, 0x01, 0x0a, 0x11, 0x4d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x46, 0x72, 0x6f, 0x6d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12,
+	0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69,
+	0x64, 0x12, 0x19, 0x0a, 0x08, 0x6d, 0x73, 0x67, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x07, 0x6d, 0x73, 0x67, 0x54, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x04,
+	0x74, 0x65, 0x78, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x04, 0x74, 0x65,
+	0x78, 0x74, 0x12, 0x14, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c,
+	0x48, 0x00, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x27, 0x0a, 0x07, 0x74, 0x65, 0x78, 0x74,
+	0x75, 0x72, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x54, 0x65, 0x78, 0x74,
+	0x75, 0x72, 0x65, 0x4d, 0x73, 0x67, 0x48, 0x00, 0x52, 0x07, 0x74, 0x65, 0x78, 0x74, 0x75, 0x72,
+	0x65, 0x42, 0x09, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x66, 0x0a, 0x0a,
+	0x54, 0x65, 0x78, 0x74, 0x75, 0x72, 0x65, 0x4d, 0x73, 0x67, 0x12, 0x14, 0x0a, 0x05, 0x77, 0x69,
+	0x64, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x05, 0x77, 0x69, 0x64, 0x74, 0x68,
+	0x12, 0x16, 0x0a, 0x06, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x06, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x16, 0x0a, 0x06,
+	0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x66, 0x6f,
+	0x72, 0x6d, 0x61, 0x74, 0x22, 0x75, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
+	0x12, 0x1b, 0x0a, 0x09, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x19, 0x0a,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x70, 0x77, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x75, 0x73, 0x65, 0x72, 0x50, 0x77, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x73, 0x65, 0x72,
+	0x5f, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x75, 0x73,
+	0x65, 0x72, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x3c, 0x0a, 0x0b, 0x4f,
+	0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x73, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x1b, 0x0a, 0x09,
+	0x75, 0x73, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x32, 0x0a, 0x08, 0x47, 0x65, 0x74,
+	0x53, 0x68, 0x61, 0x72, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x40, 0x0a,
+	0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x12, 0x17, 0x0a, 0x07,
+	0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x75,
+	0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22,
+	0xb3, 0x01, 0x0a, 0x09, 0x53, 0x65, 0x6e, 0x64, 0x53, 0x68, 0x61, 0x72, 0x65, 0x12, 0x1c, 0x0a,
+	0x0a, 0x69, 0x73, 0x5f, 0x74, 0x68, 0x65, 0x5f, 0x65, 0x6e, 0x64, 0x18, 0x08, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x08, 0x69, 0x73, 0x54, 0x68, 0x65, 0x45, 0x6e, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12,
+	0x1d, 0x0a, 0x0a, 0x68, 0x69, 0x64, 0x65, 0x5f, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x02, 0x20,
+	0x03, 0x28, 0x0d, 0x52, 0x09, 0x68, 0x69, 0x64, 0x65, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x03, 0x20, 0x03, 0x28, 0x04, 0x52, 0x02, 0x69, 0x64, 0x12, 0x17,
+	0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0d, 0x52,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x18, 0x06, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x07, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x04, 0x74, 0x69, 0x6d, 0x65, 0x22, 0x63, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43,
+	0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x73, 0x68, 0x61, 0x72, 0x65, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x73, 0x68, 0x61, 0x72, 0x65, 0x49,
+	0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x5f, 0x75, 0x69, 0x64, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x09, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x55, 0x69, 0x64,
+	0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x60, 0x0a, 0x0e, 0x47, 0x65,
+	0x74, 0x53, 0x68, 0x61, 0x72, 0x65, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x02, 0x69, 0x64, 0x12, 0x21, 0x0a, 0x0c,
+	0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x12,
+	0x1b, 0x0a, 0x09, 0x69, 0x73, 0x5f, 0x68, 0x69, 0x64, 0x64, 0x65, 0x6e, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x08, 0x69, 0x73, 0x48, 0x69, 0x64, 0x64, 0x65, 0x6e, 0x22, 0x41, 0x0a, 0x0f,
+	0x53, 0x65, 0x6e, 0x64, 0x53, 0x68, 0x61, 0x72, 0x65, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12,
+	0x14, 0x0a, 0x05, 0x65, 0x78, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05,
+	0x65, 0x78, 0x69, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22,
+	0x30, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a,
+	0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x70, 0x61, 0x67,
+	0x65, 0x22, 0xb0, 0x01, 0x0a, 0x0b, 0x53, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0d, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f,
+	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x5f,
+	0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0b, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x65,
+	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x03, 0x28, 0x04, 0x52, 0x09, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x1c, 0x0a, 0x0a, 0x69, 0x73, 0x5f, 0x74, 0x68, 0x65,
+	0x5f, 0x65, 0x6e, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x69, 0x73, 0x54, 0x68,
+	0x65, 0x45, 0x6e, 0x64, 0x22, 0x43, 0x0a, 0x0b, 0x49, 0x6e, 0x71, 0x75, 0x69, 0x72, 0x79, 0x55,
+	0x73, 0x65, 0x72, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09,
+	0x75, 0x73, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x93, 0x01, 0x0a, 0x06, 0x4c, 0x69,
+	0x6b, 0x69, 0x6e, 0x67, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1d, 0x0a,
+	0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x09, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x21, 0x0a, 0x0c,
+	0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x0b, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12,
+	0x16, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x63, 0x6f, 0x75, 0x6e, 0x74,
+	0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73, 0x42,
+	0x06, 0x5a, 0x04, 0x2f, 0x6d, 0x73, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -633,23 +1472,35 @@ func file_GodQQ_protocol_GodQQ_proto_rawDescGZIP() []byte {
 	return file_GodQQ_protocol_GodQQ_proto_rawDescData
 }
 
-var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_GodQQ_protocol_GodQQ_proto_goTypes = []interface{}{
 	(*ErrToClient)(nil),       // 0: ErrToClient
 	(*OnOrOffLineMsg)(nil),    // 1: OnOrOffLineMsg
 	(*LoginFromClient)(nil),   // 2: LoginFromClient
 	(*MessageToClient)(nil),   // 3: MessageToClient
 	(*MessageFromClient)(nil), // 4: MessageFromClient
-	(*Register)(nil),          // 5: Register
-	(*Inquiry)(nil),           // 6: Inquiry
+	(*TextureMsg)(nil),        // 5: TextureMsg
+	(*Register)(nil),          // 6: Register
 	(*OnlineUsers)(nil),       // 7: OnlineUsers
+	(*GetShare)(nil),          // 8: GetShare
+	(*CreateShare)(nil),       // 9: CreateShare
+	(*SendShare)(nil),         // 10: SendShare
+	(*CreateComment)(nil),     // 11: CreateComment
+	(*GetShareDetail)(nil),    // 12: GetShareDetail
+	(*SendShareDetail)(nil),   // 13: SendShareDetail
+	(*GetComment)(nil),        // 14: GetComment
+	(*SendComment)(nil),       // 15: SendComment
+	(*InquiryUser)(nil),       // 16: InquiryUser
+	(*Liking)(nil),            // 17: Liking
 }
 var file_GodQQ_protocol_GodQQ_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	5, // 0: MessageToClient.texture:type_name -> TextureMsg
+	5, // 1: MessageFromClient.texture:type_name -> TextureMsg
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_GodQQ_protocol_GodQQ_proto_init() }
@@ -719,7 +1570,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			}
 		}
 		file_GodQQ_protocol_GodQQ_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Register); i {
+			switch v := v.(*TextureMsg); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -731,7 +1582,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			}
 		}
 		file_GodQQ_protocol_GodQQ_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Inquiry); i {
+			switch v := v.(*Register); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -754,12 +1605,139 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 				return nil
 			}
 		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetShare); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateShare); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SendShare); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateComment); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetShareDetail); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SendShareDetail); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetComment); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SendComment); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*InquiryUser); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Liking); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_GodQQ_protocol_GodQQ_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*ErrToClient_Uid)(nil),
 	}
-	file_GodQQ_protocol_GodQQ_proto_msgTypes[6].OneofWrappers = []interface{}{
-		(*Inquiry_Uid)(nil),
+	file_GodQQ_protocol_GodQQ_proto_msgTypes[3].OneofWrappers = []interface{}{
+		(*MessageToClient_Text)(nil),
+		(*MessageToClient_Data)(nil),
+		(*MessageToClient_Texture)(nil),
+	}
+	file_GodQQ_protocol_GodQQ_proto_msgTypes[4].OneofWrappers = []interface{}{
+		(*MessageFromClient_Text)(nil),
+		(*MessageFromClient_Data)(nil),
+		(*MessageFromClient_Texture)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -767,7 +1745,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_GodQQ_protocol_GodQQ_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

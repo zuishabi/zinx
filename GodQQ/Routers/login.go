@@ -2,12 +2,10 @@ package Routers
 
 import (
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"google.golang.org/protobuf/proto"
-	"strconv"
 	"zinx/GodQQ/core"
+	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
-	"zinx/GodQQ/redisQQ"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -23,54 +21,36 @@ func (l *LoginRouter) Handle(request ziface.IRequest) {
 		fmt.Println("[LoginRouter Handle] : unmarshal request err = ", err)
 		return
 	}
-	redis_conn := redisQQ.Pool.Get()
-	defer redis_conn.Close()
-	reply, err := redis_conn.Do("get", loginMsg.GetUserEmail())
-	if err != nil {
-		fmt.Println("[LoginRouter Handle] : redis get err = ", err)
+	//先检查邮箱是否正确
+	user := mysqlQQ.UserInfo{}
+	mysqlQQ.Db.Where("user_email = ?", loginMsg.GetUserEmail()).First(&user)
+	if user.UID == 0 {
+		sendLoginFailMsg(request.GetConnection(), "用户未注册")
 		return
 	}
-	//当返回为空时，表示当前邮箱没有被注册，否则返回用户名对应的密码
-	if reply == nil {
-		sendLoginFailMsg(request.GetConnection(), "邮件未被注册")
-	} else {
-		replyString := string(reply.([]uint8))
-		if replyString == loginMsg.UserPwd {
-			//认证成功，获得用户的id
-			reply, err = redis_conn.Do("hget", "user_"+loginMsg.GetUserEmail(), "uid")
-			replyString, err = redis.String(reply, err)
-			if err != nil {
-				fmt.Println("[LoginRouter Handle] : reply to string err = ", err)
-				return
-			}
-			uid, err := strconv.ParseUint(replyString, 10, 32)
-			if err != nil {
-				fmt.Println("[LoginRouter Handle] : ParseUnit err = ", err)
-				return
-			}
-			_, ok := core.IOnlineMap.UserMap[uint32(uid)]
-			if ok {
-				//当能在在线列表找到对应的用户，说明已经登录上了
-				sendLoginFailMsg(request.GetConnection(), "当前用户已登录")
-				return
-			}
-			reply, err = redis_conn.Do("hget", "user_"+loginMsg.GetUserEmail(), "user_name")
-			if err != nil {
-				fmt.Println("[LoginRouter Handle] : get user_name err = ", err)
-				return
-			}
-			userName := string(reply.([]uint8))
-			user := &core.User{
-				Uid:      uint32(uid),
-				Conn:     request.GetConnection(),
-				UserName: userName,
-			}
-			request.GetConnection().SetProperty("uid", uint32(uid))
-			core.IOnlineMap.AddUser(user)
-			sendLoginSuccessMsg(request.GetConnection(), uint32(uid))
-		} else {
-			sendLoginFailMsg(request.GetConnection(), "密码错误")
+	if user.Password == loginMsg.UserPwd {
+		//密码正确
+		//如果当前用户已经登录
+		core.IOnlineMap.UserLock.RLock()
+		_, ok := core.IOnlineMap.UserMap[user.UID]
+		if ok {
+			//当能在在线列表找到对应的用户，说明已经登录上了
+			sendLoginFailMsg(request.GetConnection(), "当前用户已登录")
+			core.IOnlineMap.UserLock.RUnlock()
+			return
 		}
+		core.IOnlineMap.UserLock.RUnlock()
+		iuser := core.User{
+			Uid:      user.UID,
+			Conn:     request.GetConnection(),
+			UserName: user.UserName,
+		}
+		request.GetConnection().SetProperty("uid", user.UID)
+		core.IOnlineMap.AddUser(&iuser)
+		sendLoginSuccessMsg(request.GetConnection(), user.UID)
+	} else {
+		//密码错误
+		sendLoginFailMsg(request.GetConnection(), "密码错误")
 	}
 }
 
@@ -111,8 +91,8 @@ func sendLoginSuccessMsg(conn ziface.IConnection, uid uint32) {
 	user := core.IOnlineMap.GetUserByConn(conn)
 	onOrOffLine := &msg.OnOrOffLineMsg{
 		Uid:      user.Uid,
-		UserName: user.UserName,
 		Type:     true,
+		UserName: user.UserName,
 	}
 	core.IOnlineMap.BroadCast(5, onOrOffLine)
 }

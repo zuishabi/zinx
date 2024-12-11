@@ -13,13 +13,13 @@ type SendOnlineUsersRouter struct {
 
 func (s *SendOnlineUsersRouter) Handle(request ziface.IRequest) {
 	onlineUsersMsg := &msg.OnlineUsers{}
-	userNames := make([]string, 0)
 	uids := make([]uint32, 0)
+	names := make([]string, 0)
 	for uid, user := range core.IOnlineMap.UserMap {
-		userNames = append(userNames, user.UserName)
 		uids = append(uids, uid)
+		names = append(names, user.UserName)
 	}
 	onlineUsersMsg.Uid = uids
-	onlineUsersMsg.Name = userNames
+	onlineUsersMsg.UserName = names
 	core.IOnlineMap.GetUserByConn(request.GetConnection()).SendMsg(4, onlineUsersMsg)
 }

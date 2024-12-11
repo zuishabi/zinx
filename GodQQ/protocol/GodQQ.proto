@@ -26,15 +26,31 @@ message LoginFromClient{
 message MessageToClient{
   uint32 uid = 1;//发送者的uid
   uint32 target_uid = 2;//如果是私聊消息，那么发送目标的uid
-  string msg = 3;//发送的信息
-  string time = 4;//发送的时间
+  oneof msg{
+    string text = 3;
+    bytes data = 4;
+    TextureMsg texture = 5;
+  }
+  string time = 6;//发送的时间
+  uint32 msg_type = 7;//发送的类型，1为文字消息，2为语音消息
 }
 
 //由客户端发送的消息
 message MessageFromClient{
   uint32 uid = 1;//如果是私聊消息，那么需要发送的uid
-  string content = 2;//发送的内容
-  uint32 type = 3;//消息的类型，1则是广播消息，2则是私聊消息
+  uint32 msg_type = 2;//发送的类型
+  oneof content{
+    string text = 3;
+    bytes data = 4;
+    TextureMsg texture = 5;//图片数据
+  }//发送的内容
+}
+
+message TextureMsg{
+  uint32 width = 1;
+  uint32 height = 2;
+  bytes data = 3;
+  uint32 format = 4;//texture的类型
 }
 
 message Register{
@@ -44,17 +60,82 @@ message Register{
   string code = 4;
 }
 
-//由客户端进行查询，服务器返回查询结果
-message Inquiry{
-  uint32 type = 1;//进行查询的类型,1为查询所有在线用户，2为查询给定uid的用户是否在线
-  oneof info{
-    uint32 uid = 2;//查询对应uid的用户
-  }
-  bool result = 3;//返回的查询结果
-}
-
 //向客户端发送所有在线的用户
 message OnlineUsers{
   repeated uint32 uid = 1;//用户的uid列表
-  repeated string name = 2;//用户的昵称
+  repeated string user_name = 2;//用户名
+}
+
+//客户端向服务端发送的请求分享的页码
+message GetShare{
+  uint32 page = 1;//查询的页码数
+  uint32 type = 2;//查询的类型，1为全局查询，2为查询自己发的share
+}
+
+//客户端向服务端进行创建share
+message CreateShare{
+  uint32 user_id = 1;//发表者的id
+  string content = 3;//发表的内容
+}
+
+//服务器向客户端发送的share
+message SendShare{
+  bool is_the_end = 8;//判断是否是表中最后一个元素
+  uint32 type = 1;//发送的类型，1为全局，2为自身查询
+  repeated uint32 hide_index = 2;//如果数据长度大于200，发送省略数据，将省略的参数放到此列中
+  repeated uint64 id = 3;//显示当前share的id
+  repeated uint32 user_id = 4;
+  repeated string content = 6;
+  repeated string time = 7;//创建的时间
+}
+
+//客户端向服务器创建评论
+message CreateComment{
+  uint64 share_id = 1;
+  uint32 target_uid = 2;//向谁进行评论，0为share
+  string content = 3;//创建的评论内容
+}
+
+// 客户端向服务器申请获得内容详情
+message GetShareDetail{
+  uint64 id = 1;
+  string updated_time = 2;//客户端向服务端发送收到的share的updated时间，如果和服务器获得的时间不同，则需要重新向客户端发送更新后的数据
+  bool is_hidden = 3;//判断客户端获得的share是否是隐藏过的
+}
+
+message SendShareDetail{
+  bool exist = 1;
+  string content = 2;
+}
+
+//客户端向服务器申请获得评论
+message GetComment{
+  uint64 id = 1;
+  uint64 page = 2;//获得评论的位置
+}
+
+//向客户端发送评论
+message SendComment{
+  uint64 id = 1;//share的id，用来防止传错
+  repeated uint32 user_id = 2;//评论的用户id
+  repeated string comment = 3;//用户的评论
+  repeated string comment_time = 4;//评论的时间
+  repeated uint64 comment_id = 5;//评论的id
+  bool is_the_end = 6;//判断是否是最后一个
+}
+
+//客户端向服务器发送一个id和名称来向服务器确认是否更换,如果没有更换则返回空
+message InquiryUser{
+  uint32 user_id = 1;
+  string user_name = 2;
+}
+
+//查询或者设置一个内容的like
+message Liking{
+  uint32 user_id = 1;
+  uint64 content_id = 2;
+  //当类型为1时是查询一个share的like，当类型为2时是设置一个share的like，当类型为3时是查询一个share的评论的like，当类型是4时是设置一个share的评论的like
+  uint32 content_type = 3;
+  bool result = 4;//返回的值或者设置的值
+  uint32 counts = 5;//返回点赞的数量
 }

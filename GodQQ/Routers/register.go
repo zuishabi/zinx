@@ -3,8 +3,8 @@ package Routers
 import (
 	"fmt"
 	"google.golang.org/protobuf/proto"
-	"strconv"
-	"zinx/GodQQ/core"
+	"gorm.io/gorm"
+	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
 	"zinx/GodQQ/redisQQ"
 	"zinx/ziface"
@@ -27,7 +27,7 @@ func (r *RegisterRouter) Handle(request ziface.IRequest) {
 	//检查验证码是否正确
 	reply, err := redis_conn.Do("get", "code_"+registerMsg.UserEmail)
 	if err != nil {
-		fmt.Println("RegisterRouter Handle] : erdis get code err = ", err)
+		fmt.Println("RegisterRouter Handle] : redis get code err = ", err)
 		return
 	}
 	//验证码不存在
@@ -39,31 +39,29 @@ func (r *RegisterRouter) Handle(request ziface.IRequest) {
 		sendRegisterFailMsg(request.GetConnection(), "验证码错误")
 		return
 	}
-
+	user := mysqlQQ.UserInfo{}
+	//检查邮箱是否重复
+	tx := mysqlQQ.Db.Session(&gorm.Session{SkipDefaultTransaction: true})
+	tx.Where("user_email = ?", registerMsg.UserEmail).First(&user)
+	if user.UID != 0 {
+		//当前邮箱已经被注册
+		sendRegisterFailMsg(request.GetConnection(), "邮箱已经被注册")
+		return
+	}
 	//检查用户名是否重复
-	reply, err = redis_conn.Do("sismember", "userName", registerMsg.UserName)
-	if err != nil {
-		fmt.Println("[RegisterRouter Handle] : redis_conn get userName err = ", err)
+	tx.Where("user_name = ?", registerMsg.UserName).First(&user)
+	if user.UID != 0 {
+		sendRegisterFailMsg(request.GetConnection(), "用户名重复")
 		return
 	}
-	//当redis的set中寻找到此用户名，则用户名重复
-	if reply.(int64) == 1 {
-		sendRegisterFailMsg(request.GetConnection(), "用户名已存在")
-		return
-	}
-
-	uid := core.GetUid()
-	//在redis中注册邮箱和对应的密码
-	redis_conn.Do("set", registerMsg.GetUserEmail(), registerMsg.UserPwd)
-	//将用户的uid和用户名存在哈希中
-	_, err = redis_conn.Do("hmset", "user_"+registerMsg.GetUserEmail(), "uid", strconv.Itoa(int(uid)), "user_name", registerMsg.GetUserName())
-	if err != nil {
-		fmt.Println(">>>>>", err)
-	}
-	//在集合中加入用户名
-	redis_conn.Do("sadd", "userName", registerMsg.UserName)
 	//删除原来的验证码
 	redis_conn.Do("del", "code_"+registerMsg.GetUserEmail())
+	sendRegisterSuccessMsg(request.GetConnection())
+	//当前用户名没有被注册，创建新用户
+	user.UserName = registerMsg.GetUserName()
+	user.Password = registerMsg.GetUserPwd()
+	user.UserEmail = registerMsg.GetUserEmail()
+	tx.Create(&user)
 	sendRegisterSuccessMsg(request.GetConnection())
 }
 

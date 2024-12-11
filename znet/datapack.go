@@ -62,7 +62,6 @@ func (dp *DataPack) Unpack(binaryData []byte) (ziface.IMessage, error) {
 	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.ID); err != nil {
 		return nil, err
 	}
-
 	//判断dataLen的长度是否超出我们允许的最大包长度
 	if utils.GlobalObject.MaxPackageSize > 0 && msg.DataLen > utils.GlobalObject.MaxPackageSize {
 		return nil, errors.New("Too large msg data recieved")
