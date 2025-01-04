@@ -31,14 +31,14 @@ type UserInfo struct {
 
 // share的喜欢表
 type ShareLikeInfo struct {
-	ShareID uint   `gorm:"primarykey;Index"`
+	ShareID uint   `gorm:"Index"`
 	UserID  uint32 `gorm:"Index"`
 	IsLike  bool
 }
 
 // ShareComment的喜欢表
 type ShareCommentsLikeInfo struct {
-	CommentID uint   `gorm:"primarykey;Index"`
+	CommentID uint   `gorm:"Index"`
 	UserID    uint32 `gorm:"Index"`
 	IsLike    bool
 }

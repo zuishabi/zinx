@@ -1,7 +1,6 @@
 package Routers
 
 import (
-	"fmt"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 	"zinx/GodQQ/core"
@@ -22,15 +21,12 @@ func (s *SendCommentRouter) Handle(request ziface.IRequest) {
 	var minShare mysqlQQ.ShareComment
 	currentShare := mysqlQQ.Db.Where("share_id = ?", req.GetId()).Session(&gorm.Session{})
 	currentShare.First(&minShare)
-	fmt.Println(minShare)
 	if req.GetPage() == 0 {
 		//申请开始的五条数据
-		fmt.Println("前五条数据")
 		currentShare.Order("id DESC").Limit(5).Find(&shareComments)
 	} else {
 		currentShare.Order("id DESC").Where("id < ?", req.Page).Limit(5).Find(&shareComments)
 	}
-
 	userIDList := make([]uint32, 0)
 	comments := make([]string, 0)
 	createTimes := make([]string, 0)

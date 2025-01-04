@@ -1,7 +1,6 @@
 package mysqlQQ
 
 import (
-	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"zinx/GodQQ/core"
@@ -13,11 +12,11 @@ var Db *gorm.DB
 func Start() error {
 	var err error
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	db, err := Db.DB()
-	fmt.Println(db.Stats().MaxOpenConnections)
-	fmt.Println(db.Stats().MaxIdleTimeClosed)
-	fmt.Println(db.Stats().MaxIdleClosed)
-	fmt.Println(db.Stats().MaxLifetimeClosed)
+	//db, err := Db.DB()
+	//fmt.Println(db.Stats().MaxOpenConnections)
+	//fmt.Println(db.Stats().MaxIdleTimeClosed)
+	//fmt.Println(db.Stats().MaxIdleClosed)
+	//fmt.Println(db.Stats().MaxLifetimeClosed)
 	if err != nil {
 		return err
 	}

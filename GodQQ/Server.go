@@ -59,6 +59,7 @@ func main() {
 	server.AddRouter(9, &Routers.CreateCommentRouter{})
 	server.AddRouter(10, &Routers.GetDetailRouter{})
 	server.AddRouter(11, &Routers.SendCommentRouter{})
+	server.AddRouter(12, &Routers.LikingRouter{})
 	server.AddRouter(200, &Routers.InquiryUserNameRouter{})
 	server.Serve()
 }

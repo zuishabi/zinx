@@ -22,6 +22,7 @@ func (c *CreateShareRouter) Handle(request ziface.IRequest) {
 	}
 	tx := mysqlQQ.Db.Session(&gorm.Session{SkipDefaultTransaction: true})
 	tx.Create(&shareInfo)
+	//在创建一个share的时候就在对应的喜欢表中创建
 	shareLikeCounts := mysqlQQ.ShareLikeCountsInfo{
 		ShareID: shareInfo.ID,
 		Counts:  0,

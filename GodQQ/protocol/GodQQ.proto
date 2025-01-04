@@ -132,7 +132,9 @@ message InquiryUser{
 
 //查询或者设置一个内容的like
 message Liking{
+  //查询或设置者的id
   uint32 user_id = 1;
+  //所查询的内容的id
   uint64 content_id = 2;
   //当类型为1时是查询一个share的like，当类型为2时是设置一个share的like，当类型为3时是查询一个share的评论的like，当类型是4时是设置一个share的评论的like
   uint32 content_type = 3;
