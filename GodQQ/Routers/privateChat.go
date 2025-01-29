@@ -26,6 +26,9 @@ func (p *PrivateChatRouter) Handle(request ziface.IRequest) {
 		fmt.Println("[PrivateChatRouter Handle] get property uid err = ", err)
 		return
 	}
+	//TODO先判断是否是好友
+
+	//发送消息
 	var msgToClient *msg.MessageToClient
 	if msgFromClient.MsgType == 1 {
 		msgToClient = &msg.MessageToClient{
@@ -57,6 +60,12 @@ func (p *PrivateChatRouter) Handle(request ziface.IRequest) {
 			TargetUid: msgFromClient.Uid,
 		}
 	}
-	core.IOnlineMap.GetUser(msgFromClient.Uid).SendMsg(3, msgToClient)
+	//判断对方是否在线
+	if user := core.IOnlineMap.GetUser(msgFromClient.Uid); user != nil {
+		//当前用户在线
+		user.SendMsg(3, msgToClient)
+	} else {
+		//TODO当前用户不在线
+	}
 	core.IOnlineMap.GetUser(uid.(uint32)).SendMsg(3, msgToClient)
 }

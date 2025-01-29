@@ -54,3 +54,27 @@ type ShareCommentsLikeCountsInfo struct {
 	ShareCommentID uint `gorm:"primarykey;uniqueIndex"`
 	Counts         uint32
 }
+
+// 好友表
+type FriendsList struct {
+	BigID     uint32 `gorm:"Index"`
+	SmallID   uint32 `gorm:"Index"`
+	IsFriend  bool
+	CreatedAt time.Time
+}
+
+// 好友请求表，记录所有好友请求的信息
+type AddFriendList struct {
+	SourceID uint32
+	TargetID uint32
+	Info     string
+}
+
+// 聊天记录表，记录离线的聊天记录
+type ChatsList struct {
+	UID           uint32 `gorm:"primarykey;uniqueIndex"` //主用户id
+	Friend        uint32 //给当前用户发送消息的id
+	ContentType   uint32 //聊天信息的类型
+	Content       string //聊天信息内容
+	SoundsContent []byte
+}

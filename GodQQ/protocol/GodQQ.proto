@@ -32,7 +32,7 @@ message MessageToClient{
     TextureMsg texture = 5;
   }
   string time = 6;//发送的时间
-  uint32 msg_type = 7;//发送的类型，1为文字消息，2为语音消息
+  uint32 msg_type = 7;//发送的类型，1为文字消息，2为语音消息,3为图片消息
 }
 
 //由客户端发送的消息
@@ -140,4 +140,36 @@ message Liking{
   uint32 content_type = 3;
   bool result = 4;//返回的值或者设置的值
   uint32 counts = 5;//返回点赞的数量
+}
+
+//查询一个用户是否是自己的好友
+message InquiryFriend{
+  //查询的用户的id
+  uint32 user_id = 1;
+  //查询的好友id
+  uint32 friend_id = 2;
+}
+
+//查询用户是否为好友的返回信息
+message ResultFriend{
+  //对方的id，用于判断，当id为0时代表该用户不存在
+  uint32 user_id = 1;
+  //对方的名字
+  string user_name = 2;
+  //返回的结果
+  bool is_friend = 3;
+}
+
+//好友请求和回应的信息
+message AddFriend{
+  uint32 source_id = 1;
+  uint32 target_id = 2;
+  bool type = 3;//当前消息的类型，false为对好友请求的回应，true为发送的好友请求
+  bool respond = 4;
+  string info = 5;//验证信息，或者打招呼信息
+}
+
+//获得好友列表
+message GetFriendsList{
+  repeated uint32 user_ids = 1;
 }

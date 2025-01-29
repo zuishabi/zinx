@@ -6,6 +6,8 @@ import (
 	"zinx/ziface"
 )
 
+var FunctionLists []func(user *User)
+
 // 用户的结构体
 type User struct {
 	UserName string
@@ -28,5 +30,11 @@ func (u *User) SendMsg(msgId uint32, data proto.Message) {
 	if err := u.Conn.SendBuffMsg(msgId, msg); err != nil {
 		fmt.Println("Player SendMsg err = ", err)
 		return
+	}
+}
+
+func (u *User) OnUserReady() {
+	for _, i := range FunctionLists {
+		i(u)
 	}
 }

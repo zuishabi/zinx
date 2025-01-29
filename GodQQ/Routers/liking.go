@@ -269,7 +269,7 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 		}
 		redisConn.Do("expire", "share_like_counts"+key, 600)
 		redisConn.Do("expire", "share_like"+key, 600)
-		// 将修改的点赞数量再放入 Redis 中，来进行聚合写入
+		// 将修改的点赞数量再放入Redis中，来进行聚合写入
 		aggregateCount, err := redis.Int(redisConn.Do("get", "aggregate_share_counts"+key))
 		if err != nil {
 			aggregateCount = 0

@@ -1,0 +1,21 @@
+syntax="proto3";
+
+option go_package = "/video_msg";
+
+//msgID:1,客户端发送一个视频请求
+message video_request{
+  uint32 video_id = 1;
+  uint32 start_point = 2;
+}
+
+//msgID:2客户端发送一个请求，服务器返回请求的视频信息
+message video_info{
+  uint32 video_id = 1;
+  double video_len = 2;
+}
+
+//msgID:3服务器向客户端传输flv文件
+message video_data{
+  bytes data = 1;
+  uint32 video_point = 2;
+}

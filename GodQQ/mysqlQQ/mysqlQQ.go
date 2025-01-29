@@ -36,4 +36,7 @@ func MigrateDatabase() {
 	Db.AutoMigrate(&ShareCommentsLikeInfo{})
 	Db.AutoMigrate(&ShareCommentsLikeCountsInfo{})
 	Db.AutoMigrate(&ShareLikeCountsInfo{})
+	Db.AutoMigrate(&FriendsList{})
+	Db.AutoMigrate(&ChatsList{})
+	Db.AutoMigrate(&AddFriendList{})
 }
