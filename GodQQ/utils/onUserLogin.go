@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
@@ -11,6 +14,7 @@ import (
 func init() {
 	core.FunctionLists = append(core.FunctionLists, SendFriendList)
 	core.FunctionLists = append(core.FunctionLists, SendAddFriendInfo)
+	core.FunctionLists = append(core.FunctionLists, SendChats)
 }
 
 // 向客户端发送全部的好友请求信息
@@ -44,4 +48,59 @@ func SendFriendList(user *core.User) {
 		UserIds: ids,
 	}
 	user.SendMsg(15, &friendsList)
+}
+
+// 向客户端发送所有的历史聊天记录
+func SendChats(user *core.User) {
+	is_last := false
+	chat_list := make([]mysqlQQ.ChatsList, 0)
+	for !is_last {
+		mysqlQQ.Db.Where("uid = ?", user.Uid).Limit(100).Find(&chat_list)
+		if len(chat_list) < 100 {
+			is_last = true
+		}
+		for _, chat := range chat_list {
+			if chat.ContentType == 1 {
+				msgToClient := msg.MessageToClient{
+					Uid:       chat.Friend,
+					TargetUid: user.Uid,
+					Msg:       &msg.MessageToClient_Text{Text: chat.Content},
+					Time:      chat.CreatedAt.Format("2006.01.02.15.04.05"),
+					MsgType:   1,
+				}
+				user.SendMsg(3, &msgToClient)
+			} else if chat.ContentType == 2 {
+				msgToClient := msg.MessageToClient{
+					Uid:       chat.Friend,
+					TargetUid: user.Uid,
+					Msg:       &msg.MessageToClient_Data{Data: chat.SoundsContent},
+					Time:      chat.CreatedAt.Format("2006.01.02.15.04.05"),
+					MsgType:   2,
+				}
+				user.SendMsg(3, &msgToClient)
+			} else if chat.ContentType == 3 {
+				f, err := os.Open("cache/" + chat.Content + ".png")
+				if err != nil {
+					fmt.Println("获取图片文件失败,err = ", err)
+					return
+				}
+				defer f.Close()
+				pictureData, err := io.ReadAll(f)
+				if err != nil {
+					fmt.Println("Failed to read image file, err =", err)
+					return
+				}
+				msgToClient := msg.MessageToClient{
+					Uid:       chat.Friend,
+					TargetUid: user.Uid,
+					Msg:       &msg.MessageToClient_Texture{Texture: &msg.TextureMsg{Data: pictureData}},
+					Time:      chat.CreatedAt.Format("2006.01.02.15.04.05"),
+					MsgType:   3,
+				}
+				user.SendMsg(3, &msgToClient)
+			}
+			mysqlQQ.Db.Delete(&chat_list)
+		}
+	}
+
 }

@@ -65,6 +65,15 @@ func (a *AddFriendsRouter) Handle(request ziface.IRequest) {
 			friendList.BigID = big
 			friendList.SmallID = small
 			mysqlQQ.Db.Create(&friendList)
+			//判断双方是否在线，若在线，则向对方转发addFriend信息
+			if user := core.IOnlineMap.GetUser(addFriend.GetTargetId()); user != nil {
+				//当前用户在线
+				user.SendMsg(14, &addFriend)
+			}
+			if user := core.IOnlineMap.GetUser(addFriend.GetSourceId()); user != nil {
+				//当前用户在线
+				user.SendMsg(14, &addFriend)
+			}
 		}
 		deleteFriendInfo := mysqlQQ.AddFriendList{}
 		mysqlQQ.Db.Where("source_id = ?", addFriend.SourceId).Where("target_id = ?", addFriend.TargetId).Delete(&deleteFriendInfo)

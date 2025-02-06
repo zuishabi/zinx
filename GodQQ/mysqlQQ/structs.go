@@ -72,9 +72,11 @@ type AddFriendList struct {
 
 // 聊天记录表，记录离线的聊天记录
 type ChatsList struct {
-	UID           uint32 `gorm:"primarykey;uniqueIndex"` //主用户id
+	ID            uint32 `gorm:"primarykey;uniqueIndex"`
+	UID           uint32 `gorm:"Index"` //主用户id
 	Friend        uint32 //给当前用户发送消息的id
 	ContentType   uint32 //聊天信息的类型
 	Content       string //聊天信息内容
 	SoundsContent []byte
+	CreatedAt     time.Time
 }

@@ -1,6 +1,8 @@
 package utils
 
-import msg "zinx/GodQQ/protocol"
+import (
+	msg "zinx/GodQQ/protocol"
+)
 
 //服务器回复
 
