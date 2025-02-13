@@ -7,6 +7,7 @@ import (
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
 	"zinx/GodQQ/redisQQ"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -44,6 +45,8 @@ func main() {
 	} else {
 		fmt.Println("success connect to redis")
 	}
+	//初始化视频模块
+	utils.InitVideoModule()
 	//开启服务器
 	server := znet.NewServer()
 	server.SetOnConnStart(OnConnStart)
@@ -64,5 +67,7 @@ func main() {
 	server.AddRouter(13, &Routers.InquiryFriendRouter{})
 	server.AddRouter(14, &Routers.AddFriendsRouter{})
 	server.AddRouter(100, &Routers.UserReadyRouter{})
+	server.AddRouter(16, &Routers.SendVideoRouter{})
+	server.AddRouter(17, &Routers.SendVideoDataRouter{})
 	server.Serve()
 }

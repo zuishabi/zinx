@@ -31,15 +31,15 @@ type UserInfo struct {
 
 // share的喜欢表
 type ShareLikeInfo struct {
-	ShareID uint   `gorm:"Index"`
-	UserID  uint32 `gorm:"Index"`
+	ShareID uint   `gorm:"Index:idx_share_id"`
+	UserID  uint32 `gorm:"Index:idx_user_id"`
 	IsLike  bool
 }
 
 // ShareComment的喜欢表
 type ShareCommentsLikeInfo struct {
-	CommentID uint   `gorm:"Index"`
-	UserID    uint32 `gorm:"Index"`
+	CommentID uint   `gorm:"Index:idx_comment_id"`
+	UserID    uint32 `gorm:"Index:idx_user_id"`
 	IsLike    bool
 }
 
@@ -57,8 +57,8 @@ type ShareCommentsLikeCountsInfo struct {
 
 // 好友表
 type FriendsList struct {
-	BigID     uint32 `gorm:"Index"`
-	SmallID   uint32 `gorm:"Index"`
+	BigID     uint32 `gorm:"Index:idx_big_id"`
+	SmallID   uint32 `gorm:"Index:idx_small_id"`
 	IsFriend  bool
 	CreatedAt time.Time
 }
@@ -79,4 +79,14 @@ type ChatsList struct {
 	Content       string //聊天信息内容
 	SoundsContent []byte
 	CreatedAt     time.Time
+}
+
+type VideoList struct {
+	ID               uint32 `gorm:"primarykey;uniqueIndex"`
+	VideoLen         float64
+	VideoName        string `gorm:"Index:idx_video_name"`
+	PictureURL       string
+	VideoDescription string
+	CreatedAt        time.Time `gorm:"Index:idx_time"`
+	PlayTime         uint32    `gorm:"Index:idx_play_time"` //观看次数
 }

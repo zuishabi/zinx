@@ -39,4 +39,5 @@ func MigrateDatabase() {
 	Db.AutoMigrate(&FriendsList{})
 	Db.AutoMigrate(&ChatsList{})
 	Db.AutoMigrate(&AddFriendList{})
+	Db.AutoMigrate(&VideoList{})
 }

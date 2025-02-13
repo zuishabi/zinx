@@ -8,7 +8,7 @@ import (
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
-	"zinx/GodQQ/utils"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )

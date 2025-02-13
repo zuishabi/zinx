@@ -173,3 +173,32 @@ message AddFriend{
 message GetFriendsList{
   repeated uint32 user_ids = 1;
 }
+
+//获得视频信息列表
+message GetVideoList{
+  uint32 page = 1;//查询的页数，即当前客户端发送的最小的id，服务器寻找更小的id
+  uint32 type = 2;//查询的类型，1为按照时间查询
+}
+
+//服务器返回的视频信息
+message SendVideoList{
+  repeated uint32 video_id = 1;
+  repeated double video_len = 2;
+  repeated uint32 video_play_time = 3;
+  repeated string video_name = 4;
+  repeated string video_description = 5;
+  repeated string video_create_time = 6;
+  bool is_last = 7;//判断是否是最后一个
+}
+
+//请求视频节点
+message VideoRequest{
+  uint32 id = 1;
+  uint32 start_point = 2;
+}
+
+//返回视频节点
+message VideoData{
+  bytes data = 1;
+  uint32 video_point = 2;
+}

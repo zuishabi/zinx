@@ -1587,6 +1587,270 @@ func (x *GetFriendsList) GetUserIds() []uint32 {
 	return nil
 }
 
+// 获得视频信息列表
+type GetVideoList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Page uint32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"` //查询的页数，即当前客户端发送的最小的id，服务器寻找更小的id
+	Type uint32 `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"` //查询的类型，1为按照时间查询
+}
+
+func (x *GetVideoList) Reset() {
+	*x = GetVideoList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetVideoList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetVideoList) ProtoMessage() {}
+
+func (x *GetVideoList) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetVideoList.ProtoReflect.Descriptor instead.
+func (*GetVideoList) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetVideoList) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetVideoList) GetType() uint32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+// 服务器返回的视频信息
+type SendVideoList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	VideoId          []uint32  `protobuf:"varint,1,rep,packed,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	VideoLen         []float64 `protobuf:"fixed64,2,rep,packed,name=video_len,json=videoLen,proto3" json:"video_len,omitempty"`
+	VideoPlayTime    []uint32  `protobuf:"varint,3,rep,packed,name=video_play_time,json=videoPlayTime,proto3" json:"video_play_time,omitempty"`
+	VideoName        []string  `protobuf:"bytes,4,rep,name=video_name,json=videoName,proto3" json:"video_name,omitempty"`
+	VideoDescription []string  `protobuf:"bytes,5,rep,name=video_description,json=videoDescription,proto3" json:"video_description,omitempty"`
+	VideoCreateTime  []string  `protobuf:"bytes,6,rep,name=video_create_time,json=videoCreateTime,proto3" json:"video_create_time,omitempty"`
+	IsLast           bool      `protobuf:"varint,7,opt,name=is_last,json=isLast,proto3" json:"is_last,omitempty"` //判断是否是最后一个
+}
+
+func (x *SendVideoList) Reset() {
+	*x = SendVideoList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SendVideoList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendVideoList) ProtoMessage() {}
+
+func (x *SendVideoList) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendVideoList.ProtoReflect.Descriptor instead.
+func (*SendVideoList) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *SendVideoList) GetVideoId() []uint32 {
+	if x != nil {
+		return x.VideoId
+	}
+	return nil
+}
+
+func (x *SendVideoList) GetVideoLen() []float64 {
+	if x != nil {
+		return x.VideoLen
+	}
+	return nil
+}
+
+func (x *SendVideoList) GetVideoPlayTime() []uint32 {
+	if x != nil {
+		return x.VideoPlayTime
+	}
+	return nil
+}
+
+func (x *SendVideoList) GetVideoName() []string {
+	if x != nil {
+		return x.VideoName
+	}
+	return nil
+}
+
+func (x *SendVideoList) GetVideoDescription() []string {
+	if x != nil {
+		return x.VideoDescription
+	}
+	return nil
+}
+
+func (x *SendVideoList) GetVideoCreateTime() []string {
+	if x != nil {
+		return x.VideoCreateTime
+	}
+	return nil
+}
+
+func (x *SendVideoList) GetIsLast() bool {
+	if x != nil {
+		return x.IsLast
+	}
+	return false
+}
+
+// 请求视频节点
+type VideoRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id         uint32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	StartPoint uint32 `protobuf:"varint,2,opt,name=start_point,json=startPoint,proto3" json:"start_point,omitempty"`
+}
+
+func (x *VideoRequest) Reset() {
+	*x = VideoRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *VideoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoRequest) ProtoMessage() {}
+
+func (x *VideoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoRequest.ProtoReflect.Descriptor instead.
+func (*VideoRequest) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *VideoRequest) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *VideoRequest) GetStartPoint() uint32 {
+	if x != nil {
+		return x.StartPoint
+	}
+	return 0
+}
+
+// 返回视频节点
+type VideoData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Data       []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	VideoPoint uint32 `protobuf:"varint,2,opt,name=video_point,json=videoPoint,proto3" json:"video_point,omitempty"`
+}
+
+func (x *VideoData) Reset() {
+	*x = VideoData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *VideoData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoData) ProtoMessage() {}
+
+func (x *VideoData) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoData.ProtoReflect.Descriptor instead.
+func (*VideoData) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *VideoData) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *VideoData) GetVideoPoint() uint32 {
+	if x != nil {
+		return x.VideoPoint
+	}
+	return 0
+}
+
 var File_GodQQ_protocol_GodQQ_proto protoreflect.FileDescriptor
 
 var file_GodQQ_protocol_GodQQ_proto_rawDesc = []byte{
@@ -1734,7 +1998,35 @@ var file_GodQQ_protocol_GodQQ_proto_rawDesc = []byte{
 	0x6e, 0x66, 0x6f, 0x22, 0x2b, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x46, 0x72, 0x69, 0x65, 0x6e, 0x64,
 	0x73, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
 	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0d, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x73,
-	0x42, 0x06, 0x5a, 0x04, 0x2f, 0x6d, 0x73, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x22, 0x36, 0x0a, 0x0c, 0x47, 0x65, 0x74, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x4c, 0x69, 0x73, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04,
+	0x70, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x80, 0x02, 0x0a, 0x0d, 0x53, 0x65, 0x6e,
+	0x64, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x76, 0x69,
+	0x64, 0x65, 0x6f, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0d, 0x52, 0x07, 0x76, 0x69,
+	0x64, 0x65, 0x6f, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x6c,
+	0x65, 0x6e, 0x18, 0x02, 0x20, 0x03, 0x28, 0x01, 0x52, 0x08, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x4c,
+	0x65, 0x6e, 0x12, 0x26, 0x0a, 0x0f, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x70, 0x6c, 0x61, 0x79,
+	0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0d, 0x52, 0x0d, 0x76, 0x69, 0x64,
+	0x65, 0x6f, 0x50, 0x6c, 0x61, 0x79, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x76, 0x69,
+	0x64, 0x65, 0x6f, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09,
+	0x76, 0x69, 0x64, 0x65, 0x6f, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x2b, 0x0a, 0x11, 0x76, 0x69, 0x64,
+	0x65, 0x6f, 0x5f, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x05,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x10, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x44, 0x65, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2a, 0x0a, 0x11, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x03, 0x28,
+	0x09, 0x52, 0x0f, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x69,
+	0x6d, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x73, 0x5f, 0x6c, 0x61, 0x73, 0x74, 0x18, 0x07, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x06, 0x69, 0x73, 0x4c, 0x61, 0x73, 0x74, 0x22, 0x3f, 0x0a, 0x0c, 0x56,
+	0x69, 0x64, 0x65, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x73,
+	0x74, 0x61, 0x72, 0x74, 0x5f, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x22, 0x40, 0x0a, 0x09,
+	0x56, 0x69, 0x64, 0x65, 0x6f, 0x44, 0x61, 0x74, 0x61, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74,
+	0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x1f, 0x0a,
+	0x0b, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x0a, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x42, 0x06,
+	0x5a, 0x04, 0x2f, 0x6d, 0x73, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1749,7 +2041,7 @@ func file_GodQQ_protocol_GodQQ_proto_rawDescGZIP() []byte {
 	return file_GodQQ_protocol_GodQQ_proto_rawDescData
 }
 
-var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_GodQQ_protocol_GodQQ_proto_goTypes = []interface{}{
 	(*ErrToClient)(nil),       // 0: ErrToClient
 	(*OnOrOffLineMsg)(nil),    // 1: OnOrOffLineMsg
@@ -1773,6 +2065,10 @@ var file_GodQQ_protocol_GodQQ_proto_goTypes = []interface{}{
 	(*ResultFriend)(nil),      // 19: ResultFriend
 	(*AddFriend)(nil),         // 20: AddFriend
 	(*GetFriendsList)(nil),    // 21: GetFriendsList
+	(*GetVideoList)(nil),      // 22: GetVideoList
+	(*SendVideoList)(nil),     // 23: SendVideoList
+	(*VideoRequest)(nil),      // 24: VideoRequest
+	(*VideoData)(nil),         // 25: VideoData
 }
 var file_GodQQ_protocol_GodQQ_proto_depIdxs = []int32{
 	5, // 0: MessageToClient.texture:type_name -> TextureMsg
@@ -2054,6 +2350,54 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 				return nil
 			}
 		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetVideoList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SendVideoList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*VideoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*VideoData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_GodQQ_protocol_GodQQ_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*ErrToClient_Uid)(nil),
@@ -2074,7 +2418,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_GodQQ_protocol_GodQQ_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

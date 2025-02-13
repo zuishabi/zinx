@@ -10,8 +10,7 @@ message video_request{
 
 //msgID:2客户端发送一个请求，服务器返回请求的视频信息
 message video_info{
-  uint32 video_id = 1;
-  double video_len = 2;
+
 }
 
 //msgID:3服务器向客户端传输flv文件
