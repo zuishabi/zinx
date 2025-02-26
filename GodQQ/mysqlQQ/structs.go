@@ -22,11 +22,11 @@ type ShareComment struct {
 }
 
 type UserInfo struct {
-	UID       uint32 `gorm:"primarykey;uniqueIndex;autoIncrement"`
+	UID       uint32 `gorm:"primarykey"`
 	CreatedAt time.Time
-	Password  string
+	Password  string `gorm:"Index:idx_email_psw"`
 	UserName  string `gorm:"uniqueIndex;size:10"`
-	UserEmail string `gorm:"Index"`
+	UserEmail string `gorm:"Index:idx_email_psw"`
 }
 
 // share的喜欢表

@@ -72,21 +72,27 @@ func InitVideoModule() {
 //	}
 func CutVideo(url string, outputDir string) error {
 	ffmpegPath := "C:\\ffmpeg-7.1-essentials_build\\bin\\ffmpeg.exe"
-	// 使用 ffmpeg 的 segment 模式进行切片
-	cmd := exec.Command(ffmpegPath, "-i", url, "-c:v", "libx264", "-c:a", "aac", "-f", "segment", "-segment_time", "8", "-reset_timestamps", "1", outputDir+"/%03d.mp4")
+	duration := GetLength(url)
+	segmentDuration := 8.0
 
-	// Capture standard output and standard error
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
+	for start := 0.0; start < duration; start += segmentDuration {
+		output := fmt.Sprintf("%s/%03d.mp4", outputDir, int(start/segmentDuration))
+		cmd := exec.Command(ffmpegPath, "-ss", fmt.Sprintf("%.2f", start), "-i", url, "-t", fmt.Sprintf("%.2f", segmentDuration), "-c:v", "libx264", "-c:a", "aac", "-y", output)
 
-	// Run the command
-	err := cmd.Run()
-	if err != nil {
-		log.Fatalf("Error processing videos: %v: %v", err, stderr.String())
-		return err
+		// Capture standard output and standard error
+		var out bytes.Buffer
+		var stderr bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = &stderr
+
+		// Run the command
+		err := cmd.Run()
+		if err != nil {
+			log.Fatalf("Error processing videos: %v: %v", err, stderr.String())
+			return err
+		}
 	}
+
 	return nil
 }
 

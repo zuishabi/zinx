@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"zinx/GodQQ/RPC"
 	"zinx/GodQQ/Routers"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
@@ -47,13 +48,15 @@ func main() {
 	}
 	//初始化视频模块
 	utils.InitVideoModule()
+	//连接到服务注册中心，并将自身注册到服务中心中
+	RPC.InitClient()
 	//开启服务器
 	server := znet.NewServer()
 	server.SetOnConnStart(OnConnStart)
 	server.SetOnConnStop(OnConnStop)
 	server.AddRouter(0, &Routers.LoginRouter{})
 	server.AddRouter(1, &Routers.BroadCastRouter{})
-	server.AddRouter(2, &Routers.RegisterRouter{})
+	//server.AddRouter(2, &Routers.RegisterRouter{})
 	server.AddRouter(3, &Routers.PrivateChatRouter{})
 	server.AddRouter(4, &Routers.SendOnlineUsersRouter{})
 	server.AddRouter(6, &Routers.GenerateCaptchaRouter{})
