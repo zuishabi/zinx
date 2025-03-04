@@ -22,6 +22,11 @@ func (u *User) SendMsg(msgId uint32, data proto.Message) {
 		fmt.Println("proto message err = ", err)
 		return
 	}
+	//当用户退出后
+	if u == nil {
+		fmt.Println("用户已退出", msgId)
+		return
+	}
 	//将二进制文件通过zinx的SendMsg将数据发送给客户端
 	if u.Conn == nil {
 		fmt.Println("connection in player is nil")

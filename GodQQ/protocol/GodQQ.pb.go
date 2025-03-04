@@ -1844,6 +1844,222 @@ func (x *VideoData) GetVideoPoint() uint32 {
 	return 0
 }
 
+// 大文件上传的请求信息
+type UploadReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Md5      string `protobuf:"bytes,1,opt,name=md5,proto3" json:"md5,omitempty"`                            //文件的md5信息
+	FileLen  uint64 `protobuf:"varint,2,opt,name=file_len,json=fileLen,proto3" json:"file_len,omitempty"`    //文件的大小
+	FileType string `protobuf:"bytes,3,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`  //文件的类型,即文件的后缀
+	FileName string `protobuf:"bytes,4,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`  //文件的名称
+	ClientId uint32 `protobuf:"varint,5,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"` //在客户端中的对应的ID，用于确定对应关系
+	FileId   uint64 `protobuf:"varint,6,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`       //用于判断是否是续传
+}
+
+func (x *UploadReq) Reset() {
+	*x = UploadReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadReq) ProtoMessage() {}
+
+func (x *UploadReq) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadReq.ProtoReflect.Descriptor instead.
+func (*UploadReq) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UploadReq) GetMd5() string {
+	if x != nil {
+		return x.Md5
+	}
+	return ""
+}
+
+func (x *UploadReq) GetFileLen() uint64 {
+	if x != nil {
+		return x.FileLen
+	}
+	return 0
+}
+
+func (x *UploadReq) GetFileType() string {
+	if x != nil {
+		return x.FileType
+	}
+	return ""
+}
+
+func (x *UploadReq) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *UploadReq) GetClientId() uint32 {
+	if x != nil {
+		return x.ClientId
+	}
+	return 0
+}
+
+func (x *UploadReq) GetFileId() uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return 0
+}
+
+// 文件上传的区块
+type UploadChunk struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Chunk  uint64 `protobuf:"varint,1,opt,name=chunk,proto3" json:"chunk,omitempty"`                 //当前文件的区块
+	Data   []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`                    //当前区块的内容
+	FileId uint64 `protobuf:"varint,3,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"` //当前文件在文件上传服务中的id
+}
+
+func (x *UploadChunk) Reset() {
+	*x = UploadChunk{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadChunk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadChunk) ProtoMessage() {}
+
+func (x *UploadChunk) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadChunk.ProtoReflect.Descriptor instead.
+func (*UploadChunk) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UploadChunk) GetChunk() uint64 {
+	if x != nil {
+		return x.Chunk
+	}
+	return 0
+}
+
+func (x *UploadChunk) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *UploadChunk) GetFileId() uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return 0
+}
+
+// 客户端与服务器之间交互的文件上传的信息
+type UploadInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type     uint32 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`                   //传递信息的类型，0为开始，1为暂停，2为终止,3为完成
+	FileId   uint64 `protobuf:"varint,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"` //传递的文件的id
+	ClientId uint32 `protobuf:"varint,5,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+}
+
+func (x *UploadInfo) Reset() {
+	*x = UploadInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadInfo) ProtoMessage() {}
+
+func (x *UploadInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadInfo.ProtoReflect.Descriptor instead.
+func (*UploadInfo) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *UploadInfo) GetType() uint32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *UploadInfo) GetFileId() uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return 0
+}
+
+func (x *UploadInfo) GetClientId() uint32 {
+	if x != nil {
+		return x.ClientId
+	}
+	return 0
+}
+
 var File_GodQQ_protocol_GodQQ_proto protoreflect.FileDescriptor
 
 var file_GodQQ_protocol_GodQQ_proto_rawDesc = []byte{
@@ -2016,8 +2232,29 @@ var file_GodQQ_protocol_GodQQ_proto_rawDesc = []byte{
 	0x61, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52,
 	0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x1f, 0x0a, 0x0b, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x70,
 	0x6f, 0x69, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a, 0x76, 0x69, 0x64, 0x65,
-	0x6f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x42, 0x06, 0x5a, 0x04, 0x2f, 0x6d, 0x73, 0x67, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x22, 0xa8, 0x01, 0x0a, 0x09, 0x55, 0x70, 0x6c, 0x6f, 0x61,
+	0x64, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x64, 0x35, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6d, 0x64, 0x35, 0x12, 0x19, 0x0a, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6c,
+	0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x65,
+	0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1b,
+	0x0a, 0x09, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08,
+	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65,
+	0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49,
+	0x64, 0x22, 0x50, 0x0a, 0x0b, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43, 0x68, 0x75, 0x6e, 0x6b,
+	0x12, 0x14, 0x0a, 0x05, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x05, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69,
+	0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c,
+	0x65, 0x49, 0x64, 0x22, 0x56, 0x0a, 0x0a, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6e, 0x66,
+	0x6f, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52,
+	0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x1b,
+	0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x0d, 0x52, 0x08, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x42, 0x06, 0x5a, 0x04, 0x2f,
+	0x6d, 0x73, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2032,7 +2269,7 @@ func file_GodQQ_protocol_GodQQ_proto_rawDescGZIP() []byte {
 	return file_GodQQ_protocol_GodQQ_proto_rawDescData
 }
 
-var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_GodQQ_protocol_GodQQ_proto_goTypes = []interface{}{
 	(*ErrToClient)(nil),       // 0: ErrToClient
 	(*OnOrOffLineMsg)(nil),    // 1: OnOrOffLineMsg
@@ -2060,6 +2297,9 @@ var file_GodQQ_protocol_GodQQ_proto_goTypes = []interface{}{
 	(*SendVideoList)(nil),     // 23: SendVideoList
 	(*VideoRequest)(nil),      // 24: VideoRequest
 	(*VideoData)(nil),         // 25: VideoData
+	(*UploadReq)(nil),         // 26: UploadReq
+	(*UploadChunk)(nil),       // 27: UploadChunk
+	(*UploadInfo)(nil),        // 28: UploadInfo
 }
 var file_GodQQ_protocol_GodQQ_proto_depIdxs = []int32{
 	5, // 0: MessageToClient.texture:type_name -> TextureMsg
@@ -2389,6 +2629,42 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 				return nil
 			}
 		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadChunk); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_GodQQ_protocol_GodQQ_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*ErrToClient_Uid)(nil),
@@ -2409,7 +2685,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_GodQQ_protocol_GodQQ_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

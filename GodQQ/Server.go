@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"zinx/GodQQ/CloudStore"
 	"zinx/GodQQ/RPC"
 	"zinx/GodQQ/Routers"
 	"zinx/GodQQ/core"
@@ -28,6 +29,7 @@ func OnConnStop(conn ziface.IConnection) {
 		}
 		core.IOnlineMap.BroadCast(5, onOrOffLine)
 	}
+	CloudStore.CloseConn(user.Uid)
 }
 
 func main() {
@@ -50,6 +52,8 @@ func main() {
 	utils.InitVideoModule()
 	//连接到服务注册中心，并将自身注册到服务中心中
 	RPC.InitClient()
+	//开启网盘服务
+	CloudStore.InitService()
 	//开启服务器
 	server := znet.NewServer()
 	server.SetOnConnStart(OnConnStart)
@@ -72,5 +76,8 @@ func main() {
 	server.AddRouter(100, &Routers.UserReadyRouter{})
 	server.AddRouter(16, &Routers.SendVideoRouter{})
 	server.AddRouter(17, &Routers.SendVideoDataRouter{})
+	server.AddRouter(22, &Routers.UploadFileReqRouter{})
+	server.AddRouter(24, &Routers.UploadFileChunkRouter{})
+	server.AddRouter(26, &Routers.UploadFileInfoRouter{})
 	server.Serve()
 }

@@ -1,0 +1,61 @@
+syntax="proto3";
+
+option go_package = "/gRPCProto";
+
+service FilesInfo{
+  //请求获得文件的上传列表
+  rpc GetUploadingFileList(UserInfo) returns (FileList){}
+  //请求建立一个传输请求
+  rpc RequestUploadFile(UploadFileInfo) returns(UploadFileInfoRsp){}
+  //请求建立一个下载的请求
+  rpc RequestDownloadFile(DownloadFileInfo) returns(DownloadFileInfoRsp){}
+  //确认完成上传文件
+  rpc UploadFileComplete(CompleteInfo)returns(Empty){}
+}
+
+message UserInfo{
+  uint32 UID = 1;
+}
+
+message FileList{
+  repeated uint64 UploadingFilesID = 1; //上传的文件ID
+  repeated uint64 UploadingChunks = 2; //上传的文件区块
+}
+
+//上传的文件的信息
+message UploadFileInfo{
+  uint32 UID = 1; //上传者的UID
+  string FileName = 2; //上传的文件名称
+  string MD5 = 3; //上传的文件的MD5值
+  uint64 FileID = 5; //文件的ID，用于判断是不是续传
+}
+
+//上传文件的请求同意后返回的文件信息
+message UploadFileInfoRsp{
+  uint64 FileID = 1;
+  uint64 ChunkID = 4; //给定的上传位置
+}
+
+//下载文件的信息
+message DownloadFileInfo{
+  uint64 FileID = 1;
+  uint64 ChunkID = 2; //给定的下载的位置
+}
+
+//下载文件的请求同意后返回的文件信息/
+message DownloadFileInfoRsp{
+  string MD5 = 1;
+  uint64 FileLen = 2;
+}
+
+//上传文件的完成通知
+message CompleteInfo{
+  uint32 UID = 1;
+  uint64 FileID = 2;
+  uint32 complete = 3;//1为暂停，2为终止，3为完成
+}
+
+//空
+message Empty{
+
+}

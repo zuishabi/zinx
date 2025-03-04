@@ -204,22 +204,26 @@ message VideoData{
 }
 
 //大文件上传的请求信息
-message UploadFile{
+message UploadReq{
   string md5 = 1;//文件的md5信息
   uint64 file_len = 2;//文件的大小
   string file_type = 3;//文件的类型,即文件的后缀
   string file_name = 4;//文件的名称
+  uint32 client_id = 5;//在客户端中的对应的ID，用于确定对应关系
+  uint64 file_id = 6;//用于判断是否是续传
 }
 
 //文件上传的区块
-message FileChunk{
-  uint32 chunk = 1;//当前文件的区块
+message UploadChunk{
+  uint64 chunk = 1;//当前文件的区块
   bytes data = 2;//当前区块的内容
-  uint32 file_id = 3;//当前文件在文件上传服务中的id
+  uint64 file_id = 3;//当前文件在文件上传服务中的id
 }
 
 //客户端与服务器之间交互的文件上传的信息
-message FileInfo{
-  uint32 type = 1;//传递信息的类型，0为开始，1为暂停，2为终止,3为完成
-  uint32 file_id = 2;//传递的文件的id
+message UploadInfo{
+  uint32 type = 1;//传递信息的类型，1为暂停，2为终止,3为完成，0为服务器返回的开始信息
+  uint64 file_id = 2;//传递的文件的id
+  uint32 client_id = 5;
 }
+
