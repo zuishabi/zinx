@@ -21,8 +21,13 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	FilesInfo_GetUploadingFileList_FullMethodName = "/FilesInfo/GetUploadingFileList"
 	FilesInfo_RequestUploadFile_FullMethodName    = "/FilesInfo/RequestUploadFile"
-	FilesInfo_RequestDownloadFile_FullMethodName  = "/FilesInfo/RequestDownloadFile"
 	FilesInfo_UploadFileComplete_FullMethodName   = "/FilesInfo/UploadFileComplete"
+	FilesInfo_GetUploadedFileList_FullMethodName  = "/FilesInfo/GetUploadedFileList"
+	FilesInfo_RequestShareFile_FullMethodName     = "/FilesInfo/RequestShareFile"
+	FilesInfo_GetShareList_FullMethodName         = "/FilesInfo/GetShareList"
+	FilesInfo_GetShareFileInfo_FullMethodName     = "/FilesInfo/GetShareFileInfo"
+	FilesInfo_DeleteUploadFile_FullMethodName     = "/FilesInfo/DeleteUploadFile"
+	FilesInfo_DeleteShareFile_FullMethodName      = "/FilesInfo/DeleteShareFile"
 )
 
 // FilesInfoClient is the client API for FilesInfo service.
@@ -33,10 +38,20 @@ type FilesInfoClient interface {
 	GetUploadingFileList(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*FileList, error)
 	// 请求建立一个传输请求
 	RequestUploadFile(ctx context.Context, in *UploadFileInfo, opts ...grpc.CallOption) (*UploadFileInfoRsp, error)
-	// 请求建立一个下载的请求
-	RequestDownloadFile(ctx context.Context, in *DownloadFileInfo, opts ...grpc.CallOption) (*DownloadFileInfoRsp, error)
 	// 确认完成上传文件
 	UploadFileComplete(ctx context.Context, in *CompleteInfo, opts ...grpc.CallOption) (*Empty, error)
+	// 请求获得自己的已上传的列表
+	GetUploadedFileList(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*UploadedFileList, error)
+	// 请求分享一个文件
+	RequestShareFile(ctx context.Context, in *ShareFile, opts ...grpc.CallOption) (*ShareFileRsp, error)
+	// 获得分享列表
+	GetShareList(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*ShareListRsp, error)
+	// 通过一个分享id获得对应的文件信息
+	GetShareFileInfo(ctx context.Context, in *ShareFileInfo, opts ...grpc.CallOption) (*ShareFileInfoRsp, error)
+	// 删除一个上传的文件
+	DeleteUploadFile(ctx context.Context, in *FileInfo, opts ...grpc.CallOption) (*Empty, error)
+	// 删除一个分享的文件
+	DeleteShareFile(ctx context.Context, in *FileInfo, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type filesInfoClient struct {
@@ -67,20 +82,70 @@ func (c *filesInfoClient) RequestUploadFile(ctx context.Context, in *UploadFileI
 	return out, nil
 }
 
-func (c *filesInfoClient) RequestDownloadFile(ctx context.Context, in *DownloadFileInfo, opts ...grpc.CallOption) (*DownloadFileInfoRsp, error) {
+func (c *filesInfoClient) UploadFileComplete(ctx context.Context, in *CompleteInfo, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DownloadFileInfoRsp)
-	err := c.cc.Invoke(ctx, FilesInfo_RequestDownloadFile_FullMethodName, in, out, cOpts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, FilesInfo_UploadFileComplete_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *filesInfoClient) UploadFileComplete(ctx context.Context, in *CompleteInfo, opts ...grpc.CallOption) (*Empty, error) {
+func (c *filesInfoClient) GetUploadedFileList(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*UploadedFileList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UploadedFileList)
+	err := c.cc.Invoke(ctx, FilesInfo_GetUploadedFileList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *filesInfoClient) RequestShareFile(ctx context.Context, in *ShareFile, opts ...grpc.CallOption) (*ShareFileRsp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareFileRsp)
+	err := c.cc.Invoke(ctx, FilesInfo_RequestShareFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *filesInfoClient) GetShareList(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*ShareListRsp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareListRsp)
+	err := c.cc.Invoke(ctx, FilesInfo_GetShareList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *filesInfoClient) GetShareFileInfo(ctx context.Context, in *ShareFileInfo, opts ...grpc.CallOption) (*ShareFileInfoRsp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareFileInfoRsp)
+	err := c.cc.Invoke(ctx, FilesInfo_GetShareFileInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *filesInfoClient) DeleteUploadFile(ctx context.Context, in *FileInfo, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, FilesInfo_UploadFileComplete_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, FilesInfo_DeleteUploadFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *filesInfoClient) DeleteShareFile(ctx context.Context, in *FileInfo, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, FilesInfo_DeleteShareFile_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,10 +160,20 @@ type FilesInfoServer interface {
 	GetUploadingFileList(context.Context, *UserInfo) (*FileList, error)
 	// 请求建立一个传输请求
 	RequestUploadFile(context.Context, *UploadFileInfo) (*UploadFileInfoRsp, error)
-	// 请求建立一个下载的请求
-	RequestDownloadFile(context.Context, *DownloadFileInfo) (*DownloadFileInfoRsp, error)
 	// 确认完成上传文件
 	UploadFileComplete(context.Context, *CompleteInfo) (*Empty, error)
+	// 请求获得自己的已上传的列表
+	GetUploadedFileList(context.Context, *UserInfo) (*UploadedFileList, error)
+	// 请求分享一个文件
+	RequestShareFile(context.Context, *ShareFile) (*ShareFileRsp, error)
+	// 获得分享列表
+	GetShareList(context.Context, *UserInfo) (*ShareListRsp, error)
+	// 通过一个分享id获得对应的文件信息
+	GetShareFileInfo(context.Context, *ShareFileInfo) (*ShareFileInfoRsp, error)
+	// 删除一个上传的文件
+	DeleteUploadFile(context.Context, *FileInfo) (*Empty, error)
+	// 删除一个分享的文件
+	DeleteShareFile(context.Context, *FileInfo) (*Empty, error)
 	mustEmbedUnimplementedFilesInfoServer()
 }
 
@@ -115,11 +190,26 @@ func (UnimplementedFilesInfoServer) GetUploadingFileList(context.Context, *UserI
 func (UnimplementedFilesInfoServer) RequestUploadFile(context.Context, *UploadFileInfo) (*UploadFileInfoRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestUploadFile not implemented")
 }
-func (UnimplementedFilesInfoServer) RequestDownloadFile(context.Context, *DownloadFileInfo) (*DownloadFileInfoRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RequestDownloadFile not implemented")
-}
 func (UnimplementedFilesInfoServer) UploadFileComplete(context.Context, *CompleteInfo) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadFileComplete not implemented")
+}
+func (UnimplementedFilesInfoServer) GetUploadedFileList(context.Context, *UserInfo) (*UploadedFileList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUploadedFileList not implemented")
+}
+func (UnimplementedFilesInfoServer) RequestShareFile(context.Context, *ShareFile) (*ShareFileRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestShareFile not implemented")
+}
+func (UnimplementedFilesInfoServer) GetShareList(context.Context, *UserInfo) (*ShareListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetShareList not implemented")
+}
+func (UnimplementedFilesInfoServer) GetShareFileInfo(context.Context, *ShareFileInfo) (*ShareFileInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetShareFileInfo not implemented")
+}
+func (UnimplementedFilesInfoServer) DeleteUploadFile(context.Context, *FileInfo) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUploadFile not implemented")
+}
+func (UnimplementedFilesInfoServer) DeleteShareFile(context.Context, *FileInfo) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteShareFile not implemented")
 }
 func (UnimplementedFilesInfoServer) mustEmbedUnimplementedFilesInfoServer() {}
 func (UnimplementedFilesInfoServer) testEmbeddedByValue()                   {}
@@ -178,24 +268,6 @@ func _FilesInfo_RequestUploadFile_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FilesInfo_RequestDownloadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DownloadFileInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FilesInfoServer).RequestDownloadFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FilesInfo_RequestDownloadFile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FilesInfoServer).RequestDownloadFile(ctx, req.(*DownloadFileInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _FilesInfo_UploadFileComplete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CompleteInfo)
 	if err := dec(in); err != nil {
@@ -210,6 +282,114 @@ func _FilesInfo_UploadFileComplete_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FilesInfoServer).UploadFileComplete(ctx, req.(*CompleteInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FilesInfo_GetUploadedFileList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesInfoServer).GetUploadedFileList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FilesInfo_GetUploadedFileList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesInfoServer).GetUploadedFileList(ctx, req.(*UserInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FilesInfo_RequestShareFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareFile)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesInfoServer).RequestShareFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FilesInfo_RequestShareFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesInfoServer).RequestShareFile(ctx, req.(*ShareFile))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FilesInfo_GetShareList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesInfoServer).GetShareList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FilesInfo_GetShareList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesInfoServer).GetShareList(ctx, req.(*UserInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FilesInfo_GetShareFileInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareFileInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesInfoServer).GetShareFileInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FilesInfo_GetShareFileInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesInfoServer).GetShareFileInfo(ctx, req.(*ShareFileInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FilesInfo_DeleteUploadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesInfoServer).DeleteUploadFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FilesInfo_DeleteUploadFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesInfoServer).DeleteUploadFile(ctx, req.(*FileInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FilesInfo_DeleteShareFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesInfoServer).DeleteShareFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FilesInfo_DeleteShareFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesInfoServer).DeleteShareFile(ctx, req.(*FileInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -230,12 +410,32 @@ var FilesInfo_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _FilesInfo_RequestUploadFile_Handler,
 		},
 		{
-			MethodName: "RequestDownloadFile",
-			Handler:    _FilesInfo_RequestDownloadFile_Handler,
-		},
-		{
 			MethodName: "UploadFileComplete",
 			Handler:    _FilesInfo_UploadFileComplete_Handler,
+		},
+		{
+			MethodName: "GetUploadedFileList",
+			Handler:    _FilesInfo_GetUploadedFileList_Handler,
+		},
+		{
+			MethodName: "RequestShareFile",
+			Handler:    _FilesInfo_RequestShareFile_Handler,
+		},
+		{
+			MethodName: "GetShareList",
+			Handler:    _FilesInfo_GetShareList_Handler,
+		},
+		{
+			MethodName: "GetShareFileInfo",
+			Handler:    _FilesInfo_GetShareFileInfo_Handler,
+		},
+		{
+			MethodName: "DeleteUploadFile",
+			Handler:    _FilesInfo_DeleteUploadFile_Handler,
+		},
+		{
+			MethodName: "DeleteShareFile",
+			Handler:    _FilesInfo_DeleteShareFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

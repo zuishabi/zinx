@@ -1844,6 +1844,54 @@ func (x *VideoData) GetVideoPoint() uint32 {
 	return 0
 }
 
+// 文件的请求信息
+type UploadList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FileId []uint64 `protobuf:"varint,1,rep,packed,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+}
+
+func (x *UploadList) Reset() {
+	*x = UploadList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadList) ProtoMessage() {}
+
+func (x *UploadList) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadList.ProtoReflect.Descriptor instead.
+func (*UploadList) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UploadList) GetFileId() []uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return nil
+}
+
 // 大文件上传的请求信息
 type UploadReq struct {
 	state         protoimpl.MessageState
@@ -1852,7 +1900,6 @@ type UploadReq struct {
 
 	Md5      string `protobuf:"bytes,1,opt,name=md5,proto3" json:"md5,omitempty"`                            //文件的md5信息
 	FileLen  uint64 `protobuf:"varint,2,opt,name=file_len,json=fileLen,proto3" json:"file_len,omitempty"`    //文件的大小
-	FileType string `protobuf:"bytes,3,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`  //文件的类型,即文件的后缀
 	FileName string `protobuf:"bytes,4,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`  //文件的名称
 	ClientId uint32 `protobuf:"varint,5,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"` //在客户端中的对应的ID，用于确定对应关系
 	FileId   uint64 `protobuf:"varint,6,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`       //用于判断是否是续传
@@ -1861,7 +1908,7 @@ type UploadReq struct {
 func (x *UploadReq) Reset() {
 	*x = UploadReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[26]
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1874,7 +1921,7 @@ func (x *UploadReq) String() string {
 func (*UploadReq) ProtoMessage() {}
 
 func (x *UploadReq) ProtoReflect() protoreflect.Message {
-	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[26]
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1887,7 +1934,7 @@ func (x *UploadReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadReq.ProtoReflect.Descriptor instead.
 func (*UploadReq) Descriptor() ([]byte, []int) {
-	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{26}
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UploadReq) GetMd5() string {
@@ -1902,13 +1949,6 @@ func (x *UploadReq) GetFileLen() uint64 {
 		return x.FileLen
 	}
 	return 0
-}
-
-func (x *UploadReq) GetFileType() string {
-	if x != nil {
-		return x.FileType
-	}
-	return ""
 }
 
 func (x *UploadReq) GetFileName() string {
@@ -1946,7 +1986,7 @@ type UploadChunk struct {
 func (x *UploadChunk) Reset() {
 	*x = UploadChunk{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[27]
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1959,7 +1999,7 @@ func (x *UploadChunk) String() string {
 func (*UploadChunk) ProtoMessage() {}
 
 func (x *UploadChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[27]
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1972,7 +2012,7 @@ func (x *UploadChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadChunk.ProtoReflect.Descriptor instead.
 func (*UploadChunk) Descriptor() ([]byte, []int) {
-	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{27}
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UploadChunk) GetChunk() uint64 {
@@ -2002,7 +2042,7 @@ type UploadInfo struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Type     uint32 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`                   //传递信息的类型，0为开始，1为暂停，2为终止,3为完成
+	Type     uint32 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`                   //传递信息的类型，1为暂停，2为终止,3为完成，0为服务器返回的开始信息
 	FileId   uint64 `protobuf:"varint,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"` //传递的文件的id
 	ClientId uint32 `protobuf:"varint,5,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 }
@@ -2010,7 +2050,7 @@ type UploadInfo struct {
 func (x *UploadInfo) Reset() {
 	*x = UploadInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[28]
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2023,7 +2063,7 @@ func (x *UploadInfo) String() string {
 func (*UploadInfo) ProtoMessage() {}
 
 func (x *UploadInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[28]
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2036,7 +2076,7 @@ func (x *UploadInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadInfo.ProtoReflect.Descriptor instead.
 func (*UploadInfo) Descriptor() ([]byte, []int) {
-	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{28}
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UploadInfo) GetType() uint32 {
@@ -2058,6 +2098,446 @@ func (x *UploadInfo) GetClientId() uint32 {
 		return x.ClientId
 	}
 	return 0
+}
+
+// 获取已经自己已经上传的文件列表
+type UploadedList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FileId      []uint64 `protobuf:"varint,1,rep,packed,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	FileLen     []uint64 `protobuf:"varint,2,rep,packed,name=file_len,json=fileLen,proto3" json:"file_len,omitempty"`
+	FileName    []string `protobuf:"bytes,3,rep,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	CreatedTime []string `protobuf:"bytes,4,rep,name=created_time,json=createdTime,proto3" json:"created_time,omitempty"`
+}
+
+func (x *UploadedList) Reset() {
+	*x = UploadedList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadedList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadedList) ProtoMessage() {}
+
+func (x *UploadedList) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadedList.ProtoReflect.Descriptor instead.
+func (*UploadedList) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *UploadedList) GetFileId() []uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return nil
+}
+
+func (x *UploadedList) GetFileLen() []uint64 {
+	if x != nil {
+		return x.FileLen
+	}
+	return nil
+}
+
+func (x *UploadedList) GetFileName() []string {
+	if x != nil {
+		return x.FileName
+	}
+	return nil
+}
+
+func (x *UploadedList) GetCreatedTime() []string {
+	if x != nil {
+		return x.CreatedTime
+	}
+	return nil
+}
+
+// 请求分享一个文件
+type RequestShareFile struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FileId uint64 `protobuf:"varint,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+}
+
+func (x *RequestShareFile) Reset() {
+	*x = RequestShareFile{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[31]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RequestShareFile) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestShareFile) ProtoMessage() {}
+
+func (x *RequestShareFile) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[31]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestShareFile.ProtoReflect.Descriptor instead.
+func (*RequestShareFile) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *RequestShareFile) GetFileId() uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return 0
+}
+
+// 请求分享后返回的分享id
+type RequestShareFileRsp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ShareId uint64 `protobuf:"varint,1,opt,name=share_id,json=shareId,proto3" json:"share_id,omitempty"`
+}
+
+func (x *RequestShareFileRsp) Reset() {
+	*x = RequestShareFileRsp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[32]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RequestShareFileRsp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestShareFileRsp) ProtoMessage() {}
+
+func (x *RequestShareFileRsp) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[32]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestShareFileRsp.ProtoReflect.Descriptor instead.
+func (*RequestShareFileRsp) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *RequestShareFileRsp) GetShareId() uint64 {
+	if x != nil {
+		return x.ShareId
+	}
+	return 0
+}
+
+// 获得的分享列表
+type ShareList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FileId      []uint64 `protobuf:"varint,1,rep,packed,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	FileLen     []uint64 `protobuf:"varint,2,rep,packed,name=file_len,json=fileLen,proto3" json:"file_len,omitempty"`
+	FileName    []string `protobuf:"bytes,3,rep,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	CreatedTime []string `protobuf:"bytes,4,rep,name=created_time,json=createdTime,proto3" json:"created_time,omitempty"`
+	ShareId     []uint64 `protobuf:"varint,5,rep,packed,name=share_id,json=shareId,proto3" json:"share_id,omitempty"`
+}
+
+func (x *ShareList) Reset() {
+	*x = ShareList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[33]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ShareList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShareList) ProtoMessage() {}
+
+func (x *ShareList) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[33]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShareList.ProtoReflect.Descriptor instead.
+func (*ShareList) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *ShareList) GetFileId() []uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return nil
+}
+
+func (x *ShareList) GetFileLen() []uint64 {
+	if x != nil {
+		return x.FileLen
+	}
+	return nil
+}
+
+func (x *ShareList) GetFileName() []string {
+	if x != nil {
+		return x.FileName
+	}
+	return nil
+}
+
+func (x *ShareList) GetCreatedTime() []string {
+	if x != nil {
+		return x.CreatedTime
+	}
+	return nil
+}
+
+func (x *ShareList) GetShareId() []uint64 {
+	if x != nil {
+		return x.ShareId
+	}
+	return nil
+}
+
+// 请求获得分享id对应的文件信息
+type GetShareFileInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ShareId uint64 `protobuf:"varint,1,opt,name=share_id,json=shareId,proto3" json:"share_id,omitempty"`
+}
+
+func (x *GetShareFileInfo) Reset() {
+	*x = GetShareFileInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[34]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetShareFileInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetShareFileInfo) ProtoMessage() {}
+
+func (x *GetShareFileInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[34]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetShareFileInfo.ProtoReflect.Descriptor instead.
+func (*GetShareFileInfo) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *GetShareFileInfo) GetShareId() uint64 {
+	if x != nil {
+		return x.ShareId
+	}
+	return 0
+}
+
+// 获得分享id对应的文件信息
+type GetShareFileInfoRsp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ShareId  uint64 `protobuf:"varint,1,opt,name=share_id,json=shareId,proto3" json:"share_id,omitempty"`
+	FileId   uint64 `protobuf:"varint,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	FileName string `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	FileLen  uint64 `protobuf:"varint,4,opt,name=file_len,json=fileLen,proto3" json:"file_len,omitempty"`
+	FileMd5  string `protobuf:"bytes,5,opt,name=file_md5,json=fileMd5,proto3" json:"file_md5,omitempty"`
+}
+
+func (x *GetShareFileInfoRsp) Reset() {
+	*x = GetShareFileInfoRsp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[35]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetShareFileInfoRsp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetShareFileInfoRsp) ProtoMessage() {}
+
+func (x *GetShareFileInfoRsp) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[35]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetShareFileInfoRsp.ProtoReflect.Descriptor instead.
+func (*GetShareFileInfoRsp) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *GetShareFileInfoRsp) GetShareId() uint64 {
+	if x != nil {
+		return x.ShareId
+	}
+	return 0
+}
+
+func (x *GetShareFileInfoRsp) GetFileId() uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return 0
+}
+
+func (x *GetShareFileInfoRsp) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *GetShareFileInfoRsp) GetFileLen() uint64 {
+	if x != nil {
+		return x.FileLen
+	}
+	return 0
+}
+
+func (x *GetShareFileInfoRsp) GetFileMd5() string {
+	if x != nil {
+		return x.FileMd5
+	}
+	return ""
+}
+
+// 请求一个下载的内容
+type DownloadChunk struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FileId  uint64 `protobuf:"varint,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	ChunkId uint64 `protobuf:"varint,2,opt,name=chunk_id,json=chunkId,proto3" json:"chunk_id,omitempty"`
+	Data    []byte `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+}
+
+func (x *DownloadChunk) Reset() {
+	*x = DownloadChunk{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[36]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DownloadChunk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadChunk) ProtoMessage() {}
+
+func (x *DownloadChunk) ProtoReflect() protoreflect.Message {
+	mi := &file_GodQQ_protocol_GodQQ_proto_msgTypes[36]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadChunk.ProtoReflect.Descriptor instead.
+func (*DownloadChunk) Descriptor() ([]byte, []int) {
+	return file_GodQQ_protocol_GodQQ_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *DownloadChunk) GetFileId() uint64 {
+	if x != nil {
+		return x.FileId
+	}
+	return 0
+}
+
+func (x *DownloadChunk) GetChunkId() uint64 {
+	if x != nil {
+		return x.ChunkId
+	}
+	return 0
+}
+
+func (x *DownloadChunk) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
 }
 
 var File_GodQQ_protocol_GodQQ_proto protoreflect.FileDescriptor
@@ -2232,29 +2712,72 @@ var file_GodQQ_protocol_GodQQ_proto_rawDesc = []byte{
 	0x61, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52,
 	0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x1f, 0x0a, 0x0b, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x70,
 	0x6f, 0x69, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a, 0x76, 0x69, 0x64, 0x65,
-	0x6f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x22, 0xa8, 0x01, 0x0a, 0x09, 0x55, 0x70, 0x6c, 0x6f, 0x61,
-	0x64, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x64, 0x35, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x03, 0x6d, 0x64, 0x35, 0x12, 0x19, 0x0a, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6c,
-	0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x65,
-	0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1b,
-	0x0a, 0x09, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x63,
-	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08,
-	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65,
-	0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49,
-	0x64, 0x22, 0x50, 0x0a, 0x0b, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43, 0x68, 0x75, 0x6e, 0x6b,
-	0x12, 0x14, 0x0a, 0x05, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52,
-	0x05, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69,
-	0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c,
-	0x65, 0x49, 0x64, 0x22, 0x56, 0x0a, 0x0a, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6e, 0x66,
-	0x6f, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52,
-	0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x1b,
-	0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28,
-	0x0d, 0x52, 0x08, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x42, 0x06, 0x5a, 0x04, 0x2f,
-	0x6d, 0x73, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x22, 0x25, 0x0a, 0x0a, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x4c, 0x69, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x22, 0x8b, 0x01,
+	0x0a, 0x09, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x6d,
+	0x64, 0x35, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x64, 0x35, 0x12, 0x19, 0x0a,
+	0x08, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6c, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x07, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x65, 0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x66, 0x69, 0x6c, 0x65,
+	0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x69, 0x6c,
+	0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f,
+	0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x06, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x22, 0x50, 0x0a, 0x0b, 0x55,
+	0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43, 0x68, 0x75, 0x6e, 0x6b, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x68,
+	0x75, 0x6e, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x63, 0x68, 0x75, 0x6e, 0x6b,
+	0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04,
+	0x64, 0x61, 0x74, 0x61, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x22, 0x56, 0x0a,
+	0x0a, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x12, 0x0a, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12,
+	0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08, 0x63, 0x6c, 0x69,
+	0x65, 0x6e, 0x74, 0x49, 0x64, 0x22, 0x82, 0x01, 0x0a, 0x0c, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x65, 0x64, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x12,
+	0x19, 0x0a, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6c, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x03, 0x28,
+	0x04, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x65, 0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x66, 0x69,
+	0x6c, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x66,
+	0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0b, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x2b, 0x0a, 0x10, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x12, 0x17,
+	0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x22, 0x30, 0x0a, 0x13, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x52, 0x73, 0x70, 0x12, 0x19,
+	0x0a, 0x08, 0x73, 0x68, 0x61, 0x72, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x07, 0x73, 0x68, 0x61, 0x72, 0x65, 0x49, 0x64, 0x22, 0x9a, 0x01, 0x0a, 0x09, 0x53, 0x68,
+	0x61, 0x72, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64,
+	0x12, 0x19, 0x0a, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6c, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x04, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x65, 0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x66,
+	0x69, 0x6c, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08,
+	0x66, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0b,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x19, 0x0a, 0x08, 0x73,
+	0x68, 0x61, 0x72, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x03, 0x28, 0x04, 0x52, 0x07, 0x73,
+	0x68, 0x61, 0x72, 0x65, 0x49, 0x64, 0x22, 0x2d, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53, 0x68, 0x61,
+	0x72, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x19, 0x0a, 0x08, 0x73, 0x68,
+	0x61, 0x72, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x73, 0x68,
+	0x61, 0x72, 0x65, 0x49, 0x64, 0x22, 0x9c, 0x01, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x53, 0x68, 0x61,
+	0x72, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x73, 0x70, 0x12, 0x19, 0x0a,
+	0x08, 0x73, 0x68, 0x61, 0x72, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x07, 0x73, 0x68, 0x61, 0x72, 0x65, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65,
+	0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49,
+	0x64, 0x12, 0x1b, 0x0a, 0x09, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x19,
+	0x0a, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x6c, 0x65, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x4c, 0x65, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x66, 0x69, 0x6c,
+	0x65, 0x5f, 0x6d, 0x64, 0x35, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x66, 0x69, 0x6c,
+	0x65, 0x4d, 0x64, 0x35, 0x22, 0x57, 0x0a, 0x0d, 0x44, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64,
+	0x43, 0x68, 0x75, 0x6e, 0x6b, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x19,
+	0x0a, 0x08, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x07, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74,
+	0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x42, 0x06, 0x5a,
+	0x04, 0x2f, 0x6d, 0x73, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2269,37 +2792,45 @@ func file_GodQQ_protocol_GodQQ_proto_rawDescGZIP() []byte {
 	return file_GodQQ_protocol_GodQQ_proto_rawDescData
 }
 
-var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_GodQQ_protocol_GodQQ_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_GodQQ_protocol_GodQQ_proto_goTypes = []interface{}{
-	(*ErrToClient)(nil),       // 0: ErrToClient
-	(*OnOrOffLineMsg)(nil),    // 1: OnOrOffLineMsg
-	(*LoginFromClient)(nil),   // 2: LoginFromClient
-	(*MessageToClient)(nil),   // 3: MessageToClient
-	(*MessageFromClient)(nil), // 4: MessageFromClient
-	(*TextureMsg)(nil),        // 5: TextureMsg
-	(*Register)(nil),          // 6: Register
-	(*OnlineUsers)(nil),       // 7: OnlineUsers
-	(*GetShare)(nil),          // 8: GetShare
-	(*CreateShare)(nil),       // 9: CreateShare
-	(*SendShare)(nil),         // 10: SendShare
-	(*CreateComment)(nil),     // 11: CreateComment
-	(*GetShareDetail)(nil),    // 12: GetShareDetail
-	(*SendShareDetail)(nil),   // 13: SendShareDetail
-	(*GetComment)(nil),        // 14: GetComment
-	(*SendComment)(nil),       // 15: SendComment
-	(*InquiryUser)(nil),       // 16: InquiryUser
-	(*Liking)(nil),            // 17: Liking
-	(*InquiryFriend)(nil),     // 18: InquiryFriend
-	(*ResultFriend)(nil),      // 19: ResultFriend
-	(*AddFriend)(nil),         // 20: AddFriend
-	(*GetFriendsList)(nil),    // 21: GetFriendsList
-	(*GetVideoList)(nil),      // 22: GetVideoList
-	(*SendVideoList)(nil),     // 23: SendVideoList
-	(*VideoRequest)(nil),      // 24: VideoRequest
-	(*VideoData)(nil),         // 25: VideoData
-	(*UploadReq)(nil),         // 26: UploadReq
-	(*UploadChunk)(nil),       // 27: UploadChunk
-	(*UploadInfo)(nil),        // 28: UploadInfo
+	(*ErrToClient)(nil),         // 0: ErrToClient
+	(*OnOrOffLineMsg)(nil),      // 1: OnOrOffLineMsg
+	(*LoginFromClient)(nil),     // 2: LoginFromClient
+	(*MessageToClient)(nil),     // 3: MessageToClient
+	(*MessageFromClient)(nil),   // 4: MessageFromClient
+	(*TextureMsg)(nil),          // 5: TextureMsg
+	(*Register)(nil),            // 6: Register
+	(*OnlineUsers)(nil),         // 7: OnlineUsers
+	(*GetShare)(nil),            // 8: GetShare
+	(*CreateShare)(nil),         // 9: CreateShare
+	(*SendShare)(nil),           // 10: SendShare
+	(*CreateComment)(nil),       // 11: CreateComment
+	(*GetShareDetail)(nil),      // 12: GetShareDetail
+	(*SendShareDetail)(nil),     // 13: SendShareDetail
+	(*GetComment)(nil),          // 14: GetComment
+	(*SendComment)(nil),         // 15: SendComment
+	(*InquiryUser)(nil),         // 16: InquiryUser
+	(*Liking)(nil),              // 17: Liking
+	(*InquiryFriend)(nil),       // 18: InquiryFriend
+	(*ResultFriend)(nil),        // 19: ResultFriend
+	(*AddFriend)(nil),           // 20: AddFriend
+	(*GetFriendsList)(nil),      // 21: GetFriendsList
+	(*GetVideoList)(nil),        // 22: GetVideoList
+	(*SendVideoList)(nil),       // 23: SendVideoList
+	(*VideoRequest)(nil),        // 24: VideoRequest
+	(*VideoData)(nil),           // 25: VideoData
+	(*UploadList)(nil),          // 26: UploadList
+	(*UploadReq)(nil),           // 27: UploadReq
+	(*UploadChunk)(nil),         // 28: UploadChunk
+	(*UploadInfo)(nil),          // 29: UploadInfo
+	(*UploadedList)(nil),        // 30: UploadedList
+	(*RequestShareFile)(nil),    // 31: RequestShareFile
+	(*RequestShareFileRsp)(nil), // 32: RequestShareFileRsp
+	(*ShareList)(nil),           // 33: ShareList
+	(*GetShareFileInfo)(nil),    // 34: GetShareFileInfo
+	(*GetShareFileInfoRsp)(nil), // 35: GetShareFileInfoRsp
+	(*DownloadChunk)(nil),       // 36: DownloadChunk
 }
 var file_GodQQ_protocol_GodQQ_proto_depIdxs = []int32{
 	5, // 0: MessageToClient.texture:type_name -> TextureMsg
@@ -2630,7 +3161,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			}
 		}
 		file_GodQQ_protocol_GodQQ_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UploadReq); i {
+			switch v := v.(*UploadList); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2642,7 +3173,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			}
 		}
 		file_GodQQ_protocol_GodQQ_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UploadChunk); i {
+			switch v := v.(*UploadReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2654,7 +3185,103 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			}
 		}
 		file_GodQQ_protocol_GodQQ_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadChunk); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UploadInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadedList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RequestShareFile); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RequestShareFileRsp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ShareList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetShareFileInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetShareFileInfoRsp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_GodQQ_protocol_GodQQ_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DownloadChunk); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2685,7 +3312,7 @@ func file_GodQQ_protocol_GodQQ_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_GodQQ_protocol_GodQQ_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   29,
+			NumMessages:   37,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

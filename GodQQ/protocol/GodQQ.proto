@@ -203,11 +203,15 @@ message VideoData{
   uint32 video_point = 2;
 }
 
+//文件的请求信息
+message UploadList{
+  repeated uint64 file_id = 1;
+}
+
 //大文件上传的请求信息
 message UploadReq{
   string md5 = 1;//文件的md5信息
   uint64 file_len = 2;//文件的大小
-  string file_type = 3;//文件的类型,即文件的后缀
   string file_name = 4;//文件的名称
   uint32 client_id = 5;//在客户端中的对应的ID，用于确定对应关系
   uint64 file_id = 6;//用于判断是否是续传
@@ -227,3 +231,50 @@ message UploadInfo{
   uint32 client_id = 5;
 }
 
+//获取已经自己已经上传的文件列表
+message UploadedList{
+  repeated uint64 file_id = 1;
+  repeated uint64 file_len = 2;
+  repeated string file_name = 3;
+  repeated string created_time = 4;
+}
+
+//请求分享一个文件
+message RequestShareFile{
+  uint64 file_id = 2;
+}
+
+//请求分享后返回的分享id
+message RequestShareFileRsp{
+  uint64 share_id = 1;
+}
+
+//获得的分享列表
+message ShareList{
+  repeated uint64 file_id = 1;
+  repeated uint64 file_len = 2;
+  repeated string file_name = 3;
+  repeated string created_time = 4;
+  repeated uint64 share_id = 5;
+}
+
+//请求获得分享id对应的文件信息
+message GetShareFileInfo{
+  uint64 share_id = 1;
+}
+
+//获得分享id对应的文件信息
+message GetShareFileInfoRsp{
+  uint64 share_id = 1;
+  uint64 file_id = 2;
+  string file_name = 3;
+  uint64 file_len = 4;
+  string file_md5 = 5;
+}
+
+//请求一个下载的内容
+message DownloadChunk{
+  uint64 file_id = 1;
+  uint64 chunk_id = 2;
+  bytes data = 3;
+}

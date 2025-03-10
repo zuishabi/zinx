@@ -23,8 +23,8 @@ func InitClient() {
 		return
 	}
 	service := Service{
-		Addr: "127.0.0.1",
-		Port: 8999,
+		Addr: "122.228.237.118",
+		Port: 17868,
 		Name: "MainServer",
 	}
 	var reply int
@@ -40,8 +40,8 @@ func InitClient() {
 func heatBeat() {
 	var reply int
 	service := Service{
-		Addr: "127.0.0.1",
-		Port: 8999,
+		Addr: "122.228.237.118",
+		Port: 17868,
 		Name: "MainServer",
 	}
 	for {

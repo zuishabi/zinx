@@ -7,19 +7,34 @@ service FilesInfo{
   rpc GetUploadingFileList(UserInfo) returns (FileList){}
   //请求建立一个传输请求
   rpc RequestUploadFile(UploadFileInfo) returns(UploadFileInfoRsp){}
-  //请求建立一个下载的请求
-  rpc RequestDownloadFile(DownloadFileInfo) returns(DownloadFileInfoRsp){}
   //确认完成上传文件
   rpc UploadFileComplete(CompleteInfo)returns(Empty){}
+  //请求获得自己的已上传的列表
+  rpc GetUploadedFileList(UserInfo) returns(UploadedFileList){}
+  //请求分享一个文件
+  rpc RequestShareFile(ShareFile) returns(ShareFileRsp){}
+  //获得分享列表
+  rpc GetShareList(UserInfo) returns(ShareListRsp){}
+  //通过一个分享id获得对应的文件信息
+  rpc GetShareFileInfo(ShareFileInfo) returns(ShareFileInfoRsp){}
+  //删除一个上传的文件
+  rpc DeleteUploadFile(FileInfo) returns(Empty){}
+  //删除一个分享的文件
+  rpc DeleteShareFile(FileInfo) returns(Empty){}
 }
 
+//用户的信息
 message UserInfo{
   uint32 UID = 1;
 }
 
+//一个文件的信息，包含文件的ID
+message FileInfo{
+  uint64 FileID = 1;
+}
+
 message FileList{
   repeated uint64 UploadingFilesID = 1; //上传的文件ID
-  repeated uint64 UploadingChunks = 2; //上传的文件区块
 }
 
 //上传的文件的信息
@@ -28,6 +43,7 @@ message UploadFileInfo{
   string FileName = 2; //上传的文件名称
   string MD5 = 3; //上传的文件的MD5值
   uint64 FileID = 5; //文件的ID，用于判断是不是续传
+  uint64 FileLen = 6; //文件的长度
 }
 
 //上传文件的请求同意后返回的文件信息
@@ -38,8 +54,8 @@ message UploadFileInfoRsp{
 
 //下载文件的信息
 message DownloadFileInfo{
-  uint64 FileID = 1;
-  uint64 ChunkID = 2; //给定的下载的位置
+  uint32 UID = 1;
+  uint64 FileID = 2;
 }
 
 //下载文件的请求同意后返回的文件信息/
@@ -58,4 +74,45 @@ message CompleteInfo{
 //空
 message Empty{
 
+}
+
+//已经上传的文件的列表
+message UploadedFileList{
+  repeated uint64 FileID = 1;
+  repeated uint64 FileLen = 2;
+  repeated string FileName = 3;
+  repeated string created_time = 4;
+}
+
+//要分享的文件信息
+message ShareFile{
+  uint32 UID = 1;
+  uint64 FileID = 2;
+}
+
+//分享文件后返回的信息
+message ShareFileRsp{
+  uint64 ShareID = 1;
+}
+
+//返回的分享列表
+message ShareListRsp{
+  repeated uint64 FileID = 1;
+  repeated uint64 FileLen = 2;
+  repeated string FileName = 3;
+  repeated string created_time = 4;
+  repeated uint64 ShareID = 5;
+}
+
+//请求获得一个分享id对应的fileid以及其信息
+message ShareFileInfo{
+  uint64 ShareID = 1;
+}
+
+//返回的share_id对应的文件信息，用于下载
+message ShareFileInfoRsp{
+  uint64 FileID = 1;
+  uint64 FileLen = 2;
+  string FileName = 3;
+  string FileMD5 = 4;
 }

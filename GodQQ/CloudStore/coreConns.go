@@ -77,7 +77,7 @@ func readGetInfo(ctx context.Context) {
 }
 
 func WriteSendInfo(ctx context.Context, key uint32, value []byte) error {
-	messageKey := make([]byte, 0)
+	messageKey := make([]byte, 4)
 	binary.BigEndian.PutUint32(messageKey, key)
 	if err := SendInfoWriter.WriteMessages(ctx, kafka.Message{Key: messageKey, Value: value}); err != nil {
 		fmt.Println("写入kafka失败,error = ", err)
@@ -86,7 +86,7 @@ func WriteSendInfo(ctx context.Context, key uint32, value []byte) error {
 	return nil
 }
 
-// 初始化服务
+// InitService 初始化服务
 func InitService() {
 	//获得tcp连接的地址
 	reply := &RPC.Service{}

@@ -28,8 +28,9 @@ func OnConnStop(conn ziface.IConnection) {
 			Type: false,
 		}
 		core.IOnlineMap.BroadCast(5, onOrOffLine)
+		CloudStore.CloseConn(user.Uid)
 	}
-	CloudStore.CloseConn(user.Uid)
+
 }
 
 func main() {
@@ -79,5 +80,11 @@ func main() {
 	server.AddRouter(22, &Routers.UploadFileReqRouter{})
 	server.AddRouter(24, &Routers.UploadFileChunkRouter{})
 	server.AddRouter(26, &Routers.UploadFileInfoRouter{})
+	server.AddRouter(20, &Routers.UploadFileListReqRouter{})
+	server.AddRouter(21, &Routers.UploadedFileListRouter{})
+	server.AddRouter(27, &Routers.RequestShareFileRouter{})
+	server.AddRouter(28, &Routers.GetShareListRouter{})
+	server.AddRouter(29, &Routers.GetShareFileInfo{})
+	server.AddRouter(25, &Routers.DownloadFileRouter{})
 	server.Serve()
 }
