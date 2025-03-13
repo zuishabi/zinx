@@ -236,7 +236,8 @@ message UploadedList{
   repeated uint64 file_id = 1;
   repeated uint64 file_len = 2;
   repeated string file_name = 3;
-  repeated string created_time = 4;
+  repeated string file_md5 = 4;
+  repeated string created_time = 5;
 }
 
 //请求分享一个文件
@@ -277,4 +278,14 @@ message DownloadChunk{
   uint64 file_id = 1;
   uint64 chunk_id = 2;
   bytes data = 3;
+}
+
+//请求删除一个上传的文件
+message DeleteUploadFile{
+  uint64 file_id = 1;
+}
+
+//请求删除一个分享的文件
+message DeleteShareFile{
+  uint64 file_id = 1;
 }

@@ -81,7 +81,8 @@ message UploadedFileList{
   repeated uint64 FileID = 1;
   repeated uint64 FileLen = 2;
   repeated string FileName = 3;
-  repeated string created_time = 4;
+  repeated string FileMD5 = 4;
+  repeated string created_time = 5;
 }
 
 //要分享的文件信息

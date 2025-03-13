@@ -22,7 +22,7 @@ var GRPCConn *grpc.ClientConn
 var TCPAddr string
 var GetInfoReader *kafka.Reader
 var SendInfoWriter = &kafka.Writer{
-	Addr:                   kafka.TCP("127.0.0.1:9092"), //可以传递多个地址来创建多个broker
+	Addr:                   kafka.TCP("127.0.0.1:9094"), //可以传递多个地址来创建多个broker
 	Topic:                  GetInfoTopic,
 	Balancer:               &kafka.Hash{}, //负载均衡算法，计算哪个partition去哪个broker
 	WriteTimeout:           10 * time.Second,
@@ -57,7 +57,7 @@ func initKafka() {
 // 从kafka通道中读取数据
 func readGetInfo(ctx context.Context) {
 	GetInfoReader = kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{"127.0.0.1:9092"},
+		Brokers:        []string{"127.0.0.1:9094"},
 		Topic:          SendInfoTopic,
 		CommitInterval: 500 * time.Millisecond,
 		StartOffset:    kafka.LastOffset,

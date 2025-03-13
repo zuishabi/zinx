@@ -86,5 +86,7 @@ func main() {
 	server.AddRouter(28, &Routers.GetShareListRouter{})
 	server.AddRouter(29, &Routers.GetShareFileInfo{})
 	server.AddRouter(25, &Routers.DownloadFileRouter{})
+	server.AddRouter(30, &Routers.DeleteUploadFileRouter{})
+	server.AddRouter(31, &Routers.DeleteShareFileRouter{})
 	server.Serve()
 }

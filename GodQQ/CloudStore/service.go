@@ -174,6 +174,17 @@ func DownloadFileChunk(uid uint32, chunkID uint64, fileID uint64) error {
 	return nil
 }
 
+// DeleteUploadFile 删除一个已经上传的文件
+func DeleteUploadFile(fileID uint64) {
+	fileInfo := gRPCProto.FileInfo{FileID: fileID}
+	_, _ = GRPCClient.DeleteUploadFile(context.Background(), &fileInfo)
+}
+
+func DeleteShareFile(fileID uint64) {
+	fileInfo := gRPCProto.FileInfo{FileID: fileID}
+	_, _ = GRPCClient.DeleteShareFile(context.Background(), &fileInfo)
+}
+
 func CloseConn(uid uint32) {
 	c, ok := connMap.Load(uid)
 	if !ok {
