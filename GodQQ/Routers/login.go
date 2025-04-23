@@ -3,11 +3,13 @@ package Routers
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
 	"zinx/GodQQ/redisQQ"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -20,15 +22,11 @@ func (l *LoginRouter) Handle(request ziface.IRequest) {
 	redisConn := redisQQ.Pool.Get()
 	defer redisConn.Close()
 	loginMsg := &msg.LoginFromClient{}
-	err := proto.Unmarshal(request.GetData(), loginMsg)
-	if err != nil {
-		fmt.Println("[LoginRouter Handle] : unmarshal request err = ", err)
-		return
-	}
+	_ = proto.Unmarshal(request.GetData(), loginMsg)
 	//从客户端获得的key中在redis中查找是否存在
 	uid, err := redis.Int(redisConn.Do("get", loginMsg.Key))
 	if err != nil {
-		fmt.Println("login err = ", err)
+		utils.L.Error("user login error,get login key error", zap.Error(err))
 		sendLoginFailMsg(request.GetConnection(), "登录失败")
 		return
 	}
@@ -62,12 +60,8 @@ func sendLoginFailMsg(conn ziface.IConnection, err_msg string) {
 		Succ:     false,
 		ErrorMsg: err_msg,
 	}
-	login_msg, err := proto.Marshal(loginMsg)
-	if err != nil {
-		fmt.Println("[LoginRouter sendLoginFailMsg] : proto marshal err = ", err)
-		return
-	}
-	err = conn.SendBuffMsg(0, login_msg)
+	m, _ := proto.Marshal(loginMsg)
+	err := conn.SendBuffMsg(0, m)
 	if err != nil {
 		fmt.Println("[LoginRouter sendLoginFailMsg] : SendMsg err = ", err)
 	}

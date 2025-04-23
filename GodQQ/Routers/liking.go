@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
 	"zinx/GodQQ/redisQQ"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -44,6 +46,7 @@ func aggregateLikes() {
 				reply, err := redis.Values(redisConn.Do("SCAN", cursor, "MATCH", "aggregate_share_counts*"))
 				if err != nil {
 					fmt.Println("SCAN error:", err)
+					utils.L.Error("scan redis aggregate_share_counts error", zap.Error(err))
 					break
 				}
 				reply, _ = redis.Scan(reply, &cursor, &keys)
@@ -55,14 +58,14 @@ func aggregateLikes() {
 			for _, key := range keys {
 				count, err := redis.Int(redisConn.Do("GET", key))
 				if err != nil {
-					fmt.Println("GET error:", err)
+					utils.L.Error("get aggregate_share_counts error", zap.Error(err))
 					continue
 				}
 				// 从键中提取 share_id
 				shareIDStr := key[len("aggregate_share_counts"):]
 				shareID, err := strconv.Atoi(shareIDStr)
 				if err != nil {
-					fmt.Println("strconv.Atoi error:", err)
+					utils.L.Error("strconv.Atoi error:", zap.Error(err))
 					continue
 				}
 				// 更新数据库中的点赞数量
@@ -107,10 +110,7 @@ func getShareLike(likeMsg *msg.Liking, user *core.User) {
 	key := strconv.Itoa(int(likeMsg.ContentId))
 	reply, err := redis.Int(redisConn.Do("get", "share_like_counts"+key))
 	if err != nil {
-		fmt.Println("getShareLike err=", err)
-		fmt.Println(redisConn.Do("get", "share_like_counts"+key))
 		//没有找到此条数据，从数据库中寻找这条数据
-		fmt.Println("getShareLike,没有找到此条数据，从数据库中寻找这条数据")
 		inquiryCounts := mysqlQQ.ShareLikeCountsInfo{}
 		tx := mysqlQQ.Db.Session(&gorm.Session{SkipDefaultTransaction: true})
 		inquiryUser := mysqlQQ.ShareLikeInfo{}
@@ -121,7 +121,7 @@ func getShareLike(likeMsg *msg.Liking, user *core.User) {
 		//将数据库中的数据放到redis中
 		_, err := redisConn.Do("set", "share_like_counts"+key, inquiryCounts.Counts)
 		if err != nil {
-			fmt.Println("set_share_like_counts err = ", err)
+			utils.L.Error("set_share_like_counts err", zap.Error(err))
 			return
 		}
 		//将所有的点赞者都放到redis中
@@ -137,7 +137,7 @@ func getShareLike(likeMsg *msg.Liking, user *core.User) {
 		redisConn.Send("expire", "share_like"+key, 600)
 		_, err = redisConn.Do("exec")
 		if err != nil {
-			fmt.Println("multi error = ", err)
+			utils.L.Error("multi error", zap.Error(err))
 			return
 		}
 	} else {
@@ -161,7 +161,7 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
-			fmt.Println("Transaction rollback due to panic:", r)
+			utils.L.Error("Transaction rollback due to panic:")
 		}
 	}()
 
@@ -178,13 +178,11 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 			}
 			if err := tx.Create(&info).Error; err != nil {
 				tx.Rollback()
-				fmt.Println("Create error:", err)
 				return
 			}
 		} else {
 			// 处理其他错误
 			tx.Rollback()
-			fmt.Println("Error:", result.Error)
 			return
 		}
 	} else {
@@ -196,7 +194,6 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 		info.IsLike = likeMsg.Result
 		if err := tx.Model(&info).Where("share_id = ?", info.ShareID).Where("user_id = ?", info.UserID).Update("IsLike", likeMsg.Result).Error; err != nil {
 			tx.Rollback()
-			fmt.Println("Update error:", err)
 			return
 		}
 	}
@@ -205,40 +202,31 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 	key := strconv.Itoa(int(likeMsg.ContentId))
 	currentCount, err := redis.Int(redisConn.Do("get", "share_like_counts"+key))
 	if err != nil {
-		fmt.Println("setShareLike err=", err)
 		// 在 Redis 中没有数据, 将从数据库中获取的所有的点赞用户数据和点赞量存入 Redis 中, 并设置过期时间
 		shareLikeCountsInfo := mysqlQQ.ShareLikeCountsInfo{}
 		if err := tx.Where("share_id = ?", likeMsg.ContentId).First(&shareLikeCountsInfo).Error; err != nil {
 			tx.Rollback()
-			fmt.Println("Query error:", err)
 			return
 		}
-		fmt.Println("set,没有在redis中找到对应数据，获取mysql中数据shareLikeCountsInfo:", shareLikeCountsInfo)
 		// 直接将查询到的数据在数据库和缓存中进行更新
 		if likeMsg.Result == true {
 			shareLikeCountsInfo.Counts += 1
-			fmt.Println("set,点赞，数量：", shareLikeCountsInfo.Counts)
 		} else {
 			shareLikeCountsInfo.Counts -= 1
-			fmt.Println("set,取消点赞，数量：", shareLikeCountsInfo.Counts)
 		}
 		if err := tx.Save(&shareLikeCountsInfo).Error; err != nil {
 			tx.Rollback()
-			fmt.Println("Save error:", err)
 			return
 		}
 		if _, err := redisConn.Do("set", "share_like_counts"+key, shareLikeCountsInfo.Counts); err != nil {
 			tx.Rollback()
-			fmt.Println("Redis set error:", err)
 			return
 		}
 		userList := make([]mysqlQQ.ShareLikeInfo, 0)
 		if err := tx.Where("share_id = ?", likeMsg.GetContentId()).Where("is_like = ?", true).Find(&userList).Error; err != nil {
 			tx.Rollback()
-			fmt.Println("Query user list error:", err)
 			return
 		}
-		fmt.Println("set,寻找到所有喜欢列表:", userList)
 		redisConn.Send("multi")
 		for _, v := range userList {
 			redisConn.Send("sadd", "share_like"+key, v.UserID)
@@ -247,7 +235,6 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 		redisConn.Send("expire", "share_like"+key, 600)
 		if _, err := redisConn.Do("exec"); err != nil {
 			tx.Rollback()
-			fmt.Println("Redis exec error:", err)
 			return
 		}
 	} else {
@@ -258,13 +245,13 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 			currentCount -= 1
 			_, err2 := redisConn.Do("srem", "share_like"+key, likeMsg.UserId)
 			if err2 != nil {
-				fmt.Println("设置错误！！！！！！！！！！！！！！！！！！", err2)
+				utils.L.Error("srem share_like"+key+"error", zap.Error(err2))
 				return
 			}
 		}
 		if _, err := redisConn.Do("set", "share_like_counts"+key, currentCount); err != nil {
 			tx.Rollback()
-			fmt.Println("Redis set error:", err)
+			utils.L.Error("redis set share_like_counts error", zap.Error(err))
 			return
 		}
 		redisConn.Do("expire", "share_like_counts"+key, 600)
@@ -281,13 +268,13 @@ func setShareLike(likeMsg *msg.Liking, user *core.User) {
 		}
 		if _, err := redisConn.Do("set", "aggregate_share_counts"+key, aggregateCount); err != nil {
 			tx.Rollback()
-			fmt.Println("Redis set aggregate error:", err)
+			utils.L.Error("redis set aggregate_share_counts error", zap.Error(err))
 			return
 		}
 	}
 
 	// 提交事务
 	if err := tx.Commit().Error; err != nil {
-		fmt.Println("Transaction commit error:", err)
+		utils.L.Error("Transaction commit error", zap.Error(err))
 	}
 }

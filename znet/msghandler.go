@@ -49,7 +49,6 @@ func (mh *MsgHandler) AddRouter(msgID uint32, router ziface.IRouter) {
 	} else {
 		//添加msgID和router的绑定关系
 		mh.Apis[msgID] = router
-		fmt.Println("add api success")
 	}
 
 }

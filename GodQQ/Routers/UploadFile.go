@@ -3,10 +3,12 @@ package Routers
 import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
+	"go.uber.org/zap"
 	"zinx/GodQQ/CloudStore"
 	gRPCProto "zinx/GodQQ/CloudStore/protocol"
 	"zinx/GodQQ/core"
 	msg "zinx/GodQQ/protocol"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -17,10 +19,8 @@ type UploadFileListReqRouter struct {
 
 // Handle 请求获得上传列表
 func (u *UploadFileListReqRouter) Handle(request ziface.IRequest) {
-	fmt.Println("获得上传列表")
 	user := core.IOnlineMap.GetUserByConn(request.GetConnection())
 	fileList := CloudStore.GetUploadList(user.Uid)
-	fmt.Println(fileList)
 	rep := msg.UploadList{FileId: fileList}
 	user.SendMsg(20, &rep)
 }
@@ -45,7 +45,6 @@ func (u *UploadFileReqRouter) Handle(request ziface.IRequest) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("传输成功")
 }
 
 type UploadFileChunkRouter struct {
@@ -83,7 +82,7 @@ func (u *UploadFileInfoRouter) Handle(request ziface.IRequest) {
 	}
 	err := CloudStore.SendUploadFileInfo(&info)
 	if err != nil {
-		fmt.Println("传递文件的完成，暂停，终止信息失败")
+		utils.L.Error("send upload file info error", zap.Error(err))
 		return
 	}
 }
@@ -95,6 +94,7 @@ type UploadedFileListRouter struct {
 func (u *UploadedFileListRouter) Handle(request ziface.IRequest) {
 	user := core.IOnlineMap.GetUserByConn(request.GetConnection())
 	list := CloudStore.GetUploadedList(user.Uid)
+	fmt.Println(list)
 	if list == nil {
 		return
 	}

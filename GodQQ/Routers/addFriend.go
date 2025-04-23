@@ -20,7 +20,7 @@ type AddFriendsRouter struct {
 // 处理添加好友
 func (a *AddFriendsRouter) Handle(request ziface.IRequest) {
 	addFriend := msg.AddFriend{}
-	proto.Unmarshal(request.GetData(), &addFriend)
+	_ = proto.Unmarshal(request.GetData(), &addFriend)
 	addFriendInfo := mysqlQQ.AddFriendList{}
 	addFriendInfo.SourceID = addFriend.SourceId
 	addFriendInfo.TargetID = addFriend.TargetId

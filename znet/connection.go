@@ -2,7 +2,7 @@ package znet
 
 import (
 	"errors"
-	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"net"
 	"sync"
@@ -59,22 +59,19 @@ func NewConnection(server ziface.IServer, conn *net.TCPConn, connID uint32, msgH
 写消息Goroutine， 用户将数据发送给客户端
 */
 func (c *Connection) StartWriter() {
-	fmt.Println("[Writer Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr().String(), "[conn Writer exit!]")
-
 	for {
 		select {
 		case data := <-c.msgChan:
 			//有数据要写给客户端
 			if _, err := c.Conn.Write(data); err != nil {
-				fmt.Println("Send Data error:, ", err, " Conn Writer exit")
+				utils.L.Warn("Send Data error,Conn Writer exit", zap.Error(err))
 				return
 			}
 		case data, ok := <-c.msgBuffChan:
 			if ok {
 				//有数据要写给客户端
 				if _, err := c.Conn.Write(data); err != nil {
-					fmt.Println("Send Buff Data error:, ", err, " Conn Writer exit")
+					utils.L.Warn("Send Buff Data error,Conn Writer exit", zap.Error(err))
 					return
 				}
 			} else {
@@ -90,10 +87,8 @@ func (c *Connection) StartWriter() {
 读消息Goroutine，用于从客户端中读取数据
 */
 func (c *Connection) StartReader() {
-	fmt.Println("[Reader Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr().String(), "[conn Reader exit!]")
+	utils.L.Info("Conn connect", zap.Uint32("id", 1))
 	defer c.Stop()
-
 	for {
 		// 创建拆包解包的对象
 		dp := NewDataPack()
@@ -101,14 +96,14 @@ func (c *Connection) StartReader() {
 		//读取客户端的Msg head
 		headData := make([]byte, dp.GetHeadLen())
 		if _, err := io.ReadFull(c.GetTCPConnection(), headData); err != nil {
-			fmt.Println("read msg head error ", err)
+			utils.L.Warn("read msg_head error", zap.Error(err))
 			break
 		}
 
 		//拆包，得到msgid 和 datalen 放在msg中
 		msg, err := dp.Unpack(headData)
 		if err != nil {
-			fmt.Println("unpack error ", err)
+			utils.L.Warn("unpack error ", zap.Error(err))
 			break
 		}
 
@@ -117,7 +112,7 @@ func (c *Connection) StartReader() {
 		if msg.GetDataLen() > 0 {
 			data = make([]byte, msg.GetDataLen())
 			if _, err := io.ReadFull(c.GetTCPConnection(), data); err != nil {
-				fmt.Println("read msg data error ", err)
+				utils.L.Warn("read msg data error ", zap.Error(err))
 				break
 			}
 		}
@@ -151,7 +146,7 @@ func (c *Connection) Start() {
 
 // 停止连接，结束当前连接状态M
 func (c *Connection) Stop() {
-	fmt.Println("Conn Stop()...ConnID = ", c.ConnID)
+	utils.L.Info("Conn disconnect", zap.Uint32("id", 2))
 	//如果当前链接已经关闭
 	if c.isClosed == true {
 		return
@@ -198,7 +193,6 @@ func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	dp := NewDataPack()
 	msg, err := dp.Pack(NewMsgPackage(msgId, data))
 	if err != nil {
-		fmt.Println("Pack error msg id = ", msgId)
 		return errors.New("Pack error msg ")
 	}
 
@@ -218,7 +212,6 @@ func (c *Connection) SendBuffMsg(msgId uint32, data []byte) error {
 	dp := NewDataPack()
 	msg, err := dp.Pack(NewMsgPackage(msgId, data))
 	if err != nil {
-		fmt.Println("Pack error msg id = ", msgId)
 		return errors.New("Pack error msg ")
 	}
 	select {

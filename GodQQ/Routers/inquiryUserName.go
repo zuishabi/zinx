@@ -1,7 +1,6 @@
 package Routers
 
 import (
-	"fmt"
 	"google.golang.org/protobuf/proto"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
@@ -16,12 +15,11 @@ type InquiryUserNameRouter struct {
 
 func (i *InquiryUserNameRouter) Handle(request ziface.IRequest) {
 	req := msg.InquiryUser{}
-	proto.Unmarshal(request.GetData(), &req)
+	_ = proto.Unmarshal(request.GetData(), &req)
 	inquiryUser := msg.InquiryUser{}
 	targetUser := mysqlQQ.UserInfo{}
 	mysqlQQ.Db.Where("uid = ?", req.GetUserId()).First(&targetUser)
 	if targetUser.UID == 0 {
-		fmt.Println("Inquiry user error")
 		return
 	}
 	inquiryUser.UserName = targetUser.UserName

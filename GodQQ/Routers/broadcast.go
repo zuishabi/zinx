@@ -1,11 +1,12 @@
 package Routers
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"time"
 	"zinx/GodQQ/core"
 	msg "zinx/GodQQ/protocol"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -16,14 +17,10 @@ type BroadCastRouter struct {
 
 func (b *BroadCastRouter) Handle(request ziface.IRequest) {
 	message := &msg.MessageFromClient{}
-	err := proto.Unmarshal(request.GetData(), message)
-	if err != nil {
-		fmt.Println("[BroadCastRouter Handle] : unmarshal msg err = ", err)
-		return
-	}
+	_ = proto.Unmarshal(request.GetData(), message)
 	iUid, err := request.GetConnection().GetProperty("uid")
 	if err != nil {
-		fmt.Println("[BroadCastRouter Handle] : get property uid err = ", err)
+		utils.L.Error("get property uid error", zap.Error(err))
 		return
 	}
 	var msgToClient *msg.MessageToClient

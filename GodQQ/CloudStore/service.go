@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/binary"
 	"encoding/json"
-	"fmt"
 	"github.com/segmentio/kafka-go"
+	"go.uber.org/zap"
 	"io"
 	"net"
 	"sync"
 	gRPCProto "zinx/GodQQ/CloudStore/protocol"
 	"zinx/GodQQ/core"
 	msg "zinx/GodQQ/protocol"
+	"zinx/utils"
 )
 
 type Conn struct {
@@ -50,7 +51,6 @@ func ProcessGetInfo(message *kafka.Message) {
 		FileId: chunkAck.FileID,
 	}
 	user.SendMsg(24, &uploadFileChunk)
-	fmt.Println("传输中...")
 }
 
 func UploadFileReq(fileInfo *gRPCProto.UploadFileInfo, clientID uint32) error {
@@ -92,7 +92,7 @@ func GetUploadList(uid uint32) []uint64 {
 	userInfo := gRPCProto.UserInfo{UID: uid}
 	list, err := GRPCClient.GetUploadingFileList(context.Background(), &userInfo)
 	if err != nil {
-		fmt.Println("获取上传列表失败,err = ", err)
+		utils.L.Error("get uploading file list error", zap.Error(err))
 		return nil
 	}
 	return list.UploadingFilesID
@@ -140,7 +140,7 @@ func GetShareFileInfo(shareID uint64) (*gRPCProto.ShareFileInfoRsp, error) {
 func SendFileChunk(Uid uint32, FileID uint64, Data []byte) {
 	c, ok := connMap.Load(Uid)
 	if !ok {
-		fmt.Println("未找到用户")
+		utils.L.Error("send file chunk fail,doesn't find user")
 	}
 	conn := c.(*Conn).TCPConn
 	idData := make([]byte, 8)
@@ -152,7 +152,6 @@ func SendFileChunk(Uid uint32, FileID uint64, Data []byte) {
 	conn.Write(lenData)
 	//写入数据
 	conn.Write(Data)
-	fmt.Println("写入成功")
 }
 
 // DownloadFileChunk 向网盘服务器请求下载一个区块
@@ -191,7 +190,7 @@ func CloseConn(uid uint32) {
 		return
 	}
 	conn := c.(*Conn)
-	conn.TCPConn.Close()
+	_ = conn.TCPConn.Close()
 	connMap.Delete(uid)
 }
 
@@ -230,21 +229,22 @@ func checkUserConnToCloudStore(uid uint32) error {
 
 // 开启tcp通道的读服务，来获得网盘服务器返回的文件数据，同时再返回给用户
 func startConnReader(conn *Conn) {
+	defer CloseConn(conn.UID)
 	for {
 		idData := make([]byte, 8)
 		if _, err := io.ReadFull(conn.TCPConn, idData); err != nil {
-			fmt.Println("获取文件下载数据失败,*1 err = ", err)
+			utils.L.Warn("read file id data error", zap.Error(err))
 			break
 		}
 		lenData := make([]byte, 4)
 		if _, err := io.ReadFull(conn.TCPConn, lenData); err != nil {
-			fmt.Println("获取文件下载数据失败,*2 err = ", err)
+			utils.L.Warn("read file len data error", zap.Error(err))
 			break
 		}
 		fileLen := binary.BigEndian.Uint32(lenData)
 		data := make([]byte, fileLen)
 		if _, err := io.ReadFull(conn.TCPConn, data); err != nil {
-			fmt.Println("获取文件下载数据失败,*3 err = ", err)
+			utils.L.Warn("read file data error", zap.Error(err))
 			break
 		}
 		// 向用户发送获得的文件数据

@@ -16,7 +16,7 @@ type SendCommentRouter struct {
 
 func (s *SendCommentRouter) Handle(request ziface.IRequest) {
 	req := msg.GetComment{}
-	proto.Unmarshal(request.GetData(), &req)
+	_ = proto.Unmarshal(request.GetData(), &req)
 	shareComments := make([]mysqlQQ.ShareComment, 5)
 	var minShare mysqlQQ.ShareComment
 	currentShare := mysqlQQ.Db.Where("share_id = ?", req.GetId()).Session(&gorm.Session{})

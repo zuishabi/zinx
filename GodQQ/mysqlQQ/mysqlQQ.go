@@ -3,7 +3,6 @@ package mysqlQQ
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"zinx/GodQQ/core"
 )
 
 var dsn string = "root:861214959@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
@@ -21,9 +20,7 @@ func Start() error {
 		return err
 	}
 	//当IsUpdated时，更新所有的数据库
-	if core.ConfigObj.IsUpdate {
-		MigrateDatabase()
-	}
+	MigrateDatabase()
 	return nil
 }
 

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"google.golang.org/protobuf/proto"
 	"sync"
 	"zinx/ziface"
@@ -24,7 +23,6 @@ func (m *OnlineMap) AddUser(user *User) {
 	m.UserLock.Lock()
 	defer m.UserLock.Unlock()
 	m.UserMap[user.Uid] = user
-	fmt.Println("[OnlineMap AddUser] Add User success")
 }
 
 func (m *OnlineMap) RemoveUser(uid uint32) {
@@ -44,7 +42,6 @@ func (m *OnlineMap) GetUserByConn(conn ziface.IConnection) *User {
 	defer m.UserLock.RUnlock()
 	uid, err := conn.GetProperty("uid")
 	if err != nil {
-		fmt.Println("[OnlineMap GetUserByConn] get property err = ", err)
 		return nil
 	}
 	return m.UserMap[uid.(uint32)]

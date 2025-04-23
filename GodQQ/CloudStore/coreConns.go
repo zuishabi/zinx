@@ -5,11 +5,13 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/segmentio/kafka-go"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"time"
 	gRPCProto "zinx/GodQQ/CloudStore/protocol"
 	"zinx/GodQQ/RPC"
+	"zinx/utils"
 )
 
 const (
@@ -35,7 +37,7 @@ func initCloudStoregRPCClient() {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	reply := &RPC.Service{}
-	err := RPC.RPCClient.Call(context.Background(), "ServiceManager.GetService", "CloudStoregRPC", &reply)
+	err := RPC.RPCClient.Call("ServiceManager.GetService", "CloudStoregRPC", &reply)
 	if err != nil {
 		//未找到合适的服务
 		panic(err)
@@ -65,9 +67,8 @@ func readGetInfo(ctx context.Context) {
 	})
 	for {
 		time.Sleep(2 * time.Second)
-		fmt.Println("读取数据")
 		if message, err := GetInfoReader.ReadMessage(ctx); err != nil {
-			fmt.Println("kafka 读取数据失败,error = ", err)
+			utils.L.Error("kafka read data error", zap.Error(err))
 			break
 		} else {
 			//处理收到的消息，为网盘服务器返回确认收到传递的文件分片
@@ -80,7 +81,7 @@ func WriteSendInfo(ctx context.Context, key uint32, value []byte) error {
 	messageKey := make([]byte, 4)
 	binary.BigEndian.PutUint32(messageKey, key)
 	if err := SendInfoWriter.WriteMessages(ctx, kafka.Message{Key: messageKey, Value: value}); err != nil {
-		fmt.Println("写入kafka失败,error = ", err)
+		utils.L.Error("write kafka message error", zap.Error(err))
 		return err
 	}
 	return nil
@@ -90,7 +91,7 @@ func WriteSendInfo(ctx context.Context, key uint32, value []byte) error {
 func InitService() {
 	//获得tcp连接的地址
 	reply := &RPC.Service{}
-	err := RPC.RPCClient.Call(context.Background(), "ServiceManager.GetService", "CloudStoreTCPConn", &reply)
+	err := RPC.RPCClient.Call("ServiceManager.GetService", "CloudStoreTCPConn", &reply)
 	if err != nil {
 		//未找到合适的服务
 		panic(err)

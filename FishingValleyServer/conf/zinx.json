@@ -1,9 +1,0 @@
-{
-  "Name":"ZinxServer",
-  "Version":"v0.4",
-  "TcpPort":8999,
-  "Host":"0.0.0.0",
-  "MaxConn":1000,
-  "MaxPackageSize":4096,
-  "WorkerPoolSize": 20
-}

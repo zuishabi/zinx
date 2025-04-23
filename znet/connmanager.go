@@ -27,7 +27,6 @@ func (connMgr *ConnManager) Add(conn ziface.IConnection) {
 	defer connMgr.connLock.Unlock()
 	//将conn加入到connections中
 	connMgr.connections[conn.GetConnID()] = conn
-	fmt.Println("connection add to ConnManager successfully: conn num = ", connMgr.Len())
 }
 
 // 删除链接
@@ -37,7 +36,6 @@ func (connMgr *ConnManager) Remove(conn ziface.IConnection) {
 	defer connMgr.connLock.Unlock()
 	//删除链接信息
 	delete(connMgr.connections, conn.GetConnID())
-	fmt.Println("connID = ", conn.GetConnID(), "remove fron ConnManager successfully: conn num =", connMgr.Len())
 }
 
 // 根据connID获取链接

@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"zinx/GodQQ/redisQQ"
 )
@@ -21,7 +20,6 @@ func init() {
 	if ConfigObj.IsRefresh {
 		MainRedisConn.Do("flushdb")
 		MainRedisConn.Do("set", "current_uid", 0)
-		fmt.Println("[GodQQ Redis] : has refresh...")
 	}
 }
 

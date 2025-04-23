@@ -1,7 +1,9 @@
 package znet
 
 import (
+	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"net"
 	"zinx/utils"
 	"zinx/ziface"
@@ -38,13 +40,13 @@ func (s *Server) Start() {
 		//获取一个TCP的Addr
 		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
 		if err != nil {
-			fmt.Println("resolve tcp addr error , err = ", err)
+			utils.L.Error("resolve tcp addr error", zap.Error(err))
 			return
 		}
 		//监听服务器的地址
 		listener, err := net.ListenTCP(s.IPVersion, addr)
 		if err != nil {
-			fmt.Println("listen", s.IPVersion, "err = ", err)
+			utils.L.Error("listen tcp error", zap.Error(err))
 			return
 		}
 		var cid uint32 = 0
@@ -53,12 +55,12 @@ func (s *Server) Start() {
 			//如果有客户端连接过来，阻塞会返回
 			conn, err := listener.AcceptTCP()
 			if err != nil {
-				fmt.Println("Accept err = ", err)
+				utils.L.Error("accept tcp error", zap.Error(err))
 				continue
 			}
 			//设置最大连接个数的判断，如果超过最大连接，那么则关闭此新的连接
 			if s.ConnManager.Len() >= utils.GlobalObject.MaxConn {
-				fmt.Println("Too Many Connections")
+				utils.L.Error("too many conn", zap.Error(errors.New("用户过多")))
 				conn.Close()
 				continue
 			}

@@ -1,9 +1,9 @@
 package RPC
 
 import (
-	"context"
-	"github.com/zuishabi/ZRPC/Client"
+	"fmt"
 	"log"
+	"net/rpc"
 	"time"
 )
 
@@ -13,11 +13,11 @@ type Service struct {
 	Name string
 }
 
-var RPCClient *Client.Client
+var RPCClient *rpc.Client
 
 func InitClient() {
 	var err error
-	RPCClient, err = Client.Dial("tcp", "127.0.0.1:9999")
+	RPCClient, err = rpc.Dial("tcp", "127.0.0.1:9999")
 	if err != nil {
 		panic(err)
 		return
@@ -28,12 +28,12 @@ func InitClient() {
 		Name: "MainServer",
 	}
 	var reply int
-	err = RPCClient.Call(context.Background(), "ServiceManager.RegisterService", service, &reply)
+	err = RPCClient.Call("ServiceManager.RegisterService", service, &reply)
 	if err != nil {
 		panic(err)
 		return
 	}
-	log.Printf("Service registered with reply: %d", reply)
+	fmt.Printf("Service registered with reply: %d", reply)
 	go heatBeat()
 }
 
@@ -47,7 +47,7 @@ func heatBeat() {
 	for {
 		select {
 		case <-time.After(time.Second * 2):
-			err := RPCClient.Call(context.Background(), "ServiceManager.CheckHeartBeat", service, &reply)
+			err := RPCClient.Call("ServiceManager.CheckHeartBeat", service, &reply)
 			if err != nil {
 				log.Println("heartbeat error = ", err)
 				return

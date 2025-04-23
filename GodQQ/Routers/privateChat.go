@@ -2,6 +2,7 @@ package Routers
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"os"
 	"time"
@@ -19,14 +20,10 @@ type PrivateChatRouter struct {
 
 func (p *PrivateChatRouter) Handle(request ziface.IRequest) {
 	msgFromClient := &msg.MessageFromClient{}
-	err := proto.Unmarshal(request.GetData(), msgFromClient)
-	if err != nil {
-		fmt.Println("[PrivateChatRouter Handle] proto unmarshal err = ", err)
-		return
-	}
+	_ = proto.Unmarshal(request.GetData(), msgFromClient)
 	uid, err := request.GetConnection().GetProperty("uid")
 	if err != nil {
-		fmt.Println("[PrivateChatRouter Handle] get property uid err = ", err)
+		utils.L.Error("get property uid error", zap.Error(err))
 		return
 	}
 	//TODO先判断是否是好友
@@ -86,7 +83,7 @@ func (p *PrivateChatRouter) Handle(request ziface.IRequest) {
 			chat.Content = utils.BytesMD5(msgToClient.GetTexture().GetData())
 			err := os.WriteFile("cache/"+chat.Content+".png", msgToClient.GetTexture().GetData(), 0644)
 			if err != nil {
-				fmt.Println("将图片保存至缓存目录失败", err)
+				utils.L.Error("save picture to the cache error", zap.Error(err))
 				return
 			}
 		}

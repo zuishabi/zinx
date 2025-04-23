@@ -16,7 +16,7 @@ type GetDetailRouter struct {
 func (g *GetDetailRouter) Handle(request ziface.IRequest) {
 	user := core.IOnlineMap.GetUserByConn(request.GetConnection())
 	getShareDetail := msg.GetShareDetail{}
-	proto.Unmarshal(request.GetData(), &getShareDetail)
+	_ = proto.Unmarshal(request.GetData(), &getShareDetail)
 	id := getShareDetail.GetId()
 	shareInfo := mysqlQQ.ShareInfo{}
 	result := mysqlQQ.Db.Where("id = ?", id).Find(&shareInfo)

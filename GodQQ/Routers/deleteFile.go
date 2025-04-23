@@ -28,6 +28,7 @@ func (d *DeleteUploadFileRouter) Handle(request ziface.IRequest) {
 		FileLen:     list.FileLen,
 		FileName:    list.FileName,
 		CreatedTime: list.CreatedTime,
+		FileMd5:     list.FileMD5,
 	}
 	user.SendMsg(21, &rsp)
 }

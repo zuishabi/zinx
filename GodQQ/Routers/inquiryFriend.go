@@ -1,7 +1,6 @@
 package Routers
 
 import (
-	"fmt"
 	"google.golang.org/protobuf/proto"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
@@ -15,17 +14,12 @@ type InquiryFriendRouter struct {
 }
 
 func (i *InquiryFriendRouter) Handle(request ziface.IRequest) {
-	fmt.Println("收到请求")
 	inquiryMsg := &msg.InquiryFriend{}
-	err := proto.Unmarshal(request.GetData(), inquiryMsg)
-	if err != nil {
-		fmt.Println("unmarshal inquiryFriend err = ", err)
-		return
-	}
+	_ = proto.Unmarshal(request.GetData(), inquiryMsg)
 	resultMsg := &msg.ResultFriend{}
 	//检查当前用户是否存在
 	userInfo := mysqlQQ.UserInfo{}
-	err = mysqlQQ.Db.Where("uid = ?", inquiryMsg.FriendId).First(&userInfo).Error
+	err := mysqlQQ.Db.Where("uid = ?", inquiryMsg.FriendId).First(&userInfo).Error
 	if err != nil {
 		resultMsg.UserId = 0
 		core.IOnlineMap.GetUserByConn(request.GetConnection()).SendMsg(13, resultMsg)

@@ -1,11 +1,12 @@
 package Routers
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -19,7 +20,7 @@ func (c *CreateCommentRouter) Handle(request ziface.IRequest) {
 	proto.Unmarshal(request.GetData(), &createComment)
 	uid, err := request.GetConnection().GetProperty("uid")
 	if err != nil {
-		fmt.Println("get property uid error = ", err)
+		utils.L.Error("get property uid error", zap.Error(err))
 		return
 	}
 	shareComment := mysqlQQ.ShareComment{

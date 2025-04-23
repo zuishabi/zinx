@@ -1,12 +1,13 @@
 package Routers
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
+	"zinx/utils"
 	"zinx/ziface"
 	"zinx/znet"
 )
@@ -35,7 +36,7 @@ func (s *SendShareRouter) Handle(request ziface.IRequest) {
 		//传递个人share
 		uid, err := request.GetConnection().GetProperty("uid")
 		if err != nil {
-			fmt.Println("[SendShareRouter] error = ", err)
+			utils.L.Error("get user property uid error", zap.Error(err))
 			return
 		}
 		sendShare.Type = 2
@@ -53,7 +54,6 @@ func (s *SendShareRouter) Handle(request ziface.IRequest) {
 		return
 	}
 	if result.Error != nil {
-		fmt.Println("----------------------->", result.Error)
 		return
 	}
 	sendShare.IsTheEnd = false

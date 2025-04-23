@@ -1,12 +1,13 @@
 package utils
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"os"
 	"zinx/GodQQ/core"
 	"zinx/GodQQ/mysqlQQ"
 	msg "zinx/GodQQ/protocol"
+	"zinx/utils"
 )
 
 //当连接建立时调用的所有函数
@@ -17,7 +18,7 @@ func init() {
 	core.FunctionLists = append(core.FunctionLists, SendChats)
 }
 
-// 向客户端发送全部的好友请求信息
+// SendAddFriendInfo 向客户端发送全部的好友请求信息
 func SendAddFriendInfo(user *core.User) {
 	addFriendMsg := msg.AddFriend{}
 	AddFriendRequests := make([]mysqlQQ.AddFriendList, 0)
@@ -31,7 +32,7 @@ func SendAddFriendInfo(user *core.User) {
 	}
 }
 
-// 向客户端发送好友列表
+// SendFriendList 向客户端发送好友列表
 func SendFriendList(user *core.User) {
 	friendsList1 := make([]mysqlQQ.FriendsList, 0)
 	friendsList2 := make([]mysqlQQ.FriendsList, 0)
@@ -50,7 +51,7 @@ func SendFriendList(user *core.User) {
 	user.SendMsg(15, &friendsList)
 }
 
-// 向客户端发送所有的历史聊天记录
+// SendChats 向客户端发送所有的历史聊天记录
 func SendChats(user *core.User) {
 	is_last := false
 	chat_list := make([]mysqlQQ.ChatsList, 0)
@@ -81,13 +82,12 @@ func SendChats(user *core.User) {
 			} else if chat.ContentType == 3 {
 				f, err := os.Open("cache/" + chat.Content + ".png")
 				if err != nil {
-					fmt.Println("获取图片文件失败,err = ", err)
+					utils.L.Error("filed to open image file", zap.Error(err))
 					return
 				}
-				defer f.Close()
 				pictureData, err := io.ReadAll(f)
 				if err != nil {
-					fmt.Println("Failed to read image file, err =", err)
+					utils.L.Error("failed to read image file", zap.Error(err))
 					return
 				}
 				msgToClient := msg.MessageToClient{
@@ -98,9 +98,11 @@ func SendChats(user *core.User) {
 					MsgType:   3,
 				}
 				user.SendMsg(3, &msgToClient)
+				if err := f.Close(); err != nil {
+					utils.L.Error("close file error", zap.Error(err))
+				}
 			}
 			mysqlQQ.Db.Delete(&chat_list)
 		}
 	}
-
 }

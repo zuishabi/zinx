@@ -55,6 +55,8 @@ func main() {
 	RPC.InitClient()
 	//开启网盘服务
 	CloudStore.InitService()
+	//开启日志服务
+	utils.InitLogger()
 	//开启服务器
 	server := znet.NewServer()
 	server.SetOnConnStart(OnConnStart)
@@ -64,7 +66,6 @@ func main() {
 	//server.AddRouter(2, &Routers.RegisterRouter{})
 	server.AddRouter(3, &Routers.PrivateChatRouter{})
 	server.AddRouter(4, &Routers.SendOnlineUsersRouter{})
-	server.AddRouter(6, &Routers.GenerateCaptchaRouter{})
 	server.AddRouter(7, &Routers.SendShareRouter{})
 	server.AddRouter(8, &Routers.CreateShareRouter{})
 	server.AddRouter(9, &Routers.CreateCommentRouter{})

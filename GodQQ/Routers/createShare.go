@@ -15,7 +15,7 @@ type CreateShareRouter struct {
 
 func (c *CreateShareRouter) Handle(request ziface.IRequest) {
 	createShare := msg.CreateShare{}
-	proto.Unmarshal(request.GetData(), &createShare)
+	_ = proto.Unmarshal(request.GetData(), &createShare)
 	shareInfo := mysqlQQ.ShareInfo{
 		Uid:     createShare.UserId,
 		Content: createShare.Content,
