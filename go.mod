@@ -1,4 +1,4 @@
-module zinx
+module github.com/zuishabi/zinx
 
 go 1.24.2
 
