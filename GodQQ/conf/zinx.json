@@ -1,9 +1,0 @@
-{
-  "Name":"GodQQ",
-  "Version":"v1.0",
-  "TcpPort":8999,
-  "Host":"0.0.0.0",
-  "MaxConn":1000,
-  "MaxPackageSize":10485760,
-  "WorkerPoolSize": 20
-}
