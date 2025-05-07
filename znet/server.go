@@ -3,10 +3,10 @@ package znet
 import (
 	"errors"
 	"fmt"
+	"github.com/zuishabi/zinx/utils"
+	"github.com/zuishabi/zinx/ziface"
 	"go.uber.org/zap"
 	"net"
-	"zinx/utils"
-	"zinx/ziface"
 )
 
 // IServer的接口实现，定义一个Server的服务器模块

@@ -2,9 +2,9 @@ package utils
 
 import (
 	"encoding/json"
+	"github.com/zuishabi/zinx/ziface"
 	"os"
 	"runtime"
-	"zinx/ziface"
 )
 
 // 存储一切有关zinx框架的全局参数，供其他模块使用，一些参数是可以通过zinx.json由用户进行配置

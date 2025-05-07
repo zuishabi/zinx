@@ -2,13 +2,13 @@ package znet
 
 import (
 	"errors"
+	"github.com/zuishabi/zinx/utils"
+	"github.com/zuishabi/zinx/ziface"
 	"go.uber.org/zap"
 	"io"
 	"net"
 	"sync"
 	"time"
-	"zinx/utils"
-	"zinx/ziface"
 )
 
 type Connection struct {

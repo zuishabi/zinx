@@ -3,7 +3,6 @@ module github.com/zuishabi/zinx
 go 1.24.2
 
 require (
-	github.com/golang/protobuf v1.5.4
 	github.com/gomodule/redigo v1.9.2
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/zuishabi/ServiceCenter v0.3.5
