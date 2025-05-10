@@ -35,10 +35,16 @@ func (k *kafkaWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func InitLogger() {
-	cfg := zap.NewProductionConfig()
-	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoder := logEncoder{Encoder: zapcore.NewJSONEncoder(cfg.EncoderConfig)}
-	core := zapcore.NewCore(encoder, zapcore.AddSync(&kafkaWriter{}), zap.InfoLevel)
-	L = zap.New(core, zap.AddCaller())
+// InitLogger 初始化日志系统，如果mode为0则为development，否则会传输到kafka中
+func InitLogger(mode int) {
+	if mode == 0 {
+		L, _ = zap.NewDevelopment()
+		return
+	} else {
+		cfg := zap.NewProductionConfig()
+		cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		encoder := logEncoder{Encoder: zapcore.NewJSONEncoder(cfg.EncoderConfig)}
+		core := zapcore.NewCore(encoder, zapcore.AddSync(&kafkaWriter{}), zap.InfoLevel)
+		L = zap.New(core, zap.AddCaller())
+	}
 }
