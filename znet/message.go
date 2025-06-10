@@ -6,7 +6,7 @@ type Message struct {
 	Data    []byte //消息的内容
 }
 
-// 创建一个message消息包的方法
+// NewMsgPackage 创建一个message消息包的方法
 func NewMsgPackage(id uint32, data []byte) *Message {
 	return &Message{
 		ID:      id,
@@ -15,32 +15,32 @@ func NewMsgPackage(id uint32, data []byte) *Message {
 	}
 }
 
-// 获取消息的id
+// GetMsgID 获取消息的id
 func (m *Message) GetMsgID() uint32 {
 	return m.ID
 }
 
-// 获取消息的长度
+// GetDataLen 获取消息的长度
 func (m *Message) GetDataLen() uint32 {
 	return m.DataLen
 }
 
-// 获取消息的内容
+// GetData 获取消息的内容
 func (m *Message) GetData() []byte {
 	return m.Data
 }
 
-// 设置消息的ID
+// SetMsgID 设置消息的ID
 func (m *Message) SetMsgID(id uint32) {
 	m.ID = id
 }
 
-// 设置消息的内容
+// SetData 设置消息的内容
 func (m *Message) SetData(data []byte) {
 	m.Data = data
 }
 
-// 设置消息的长度
+// SetDataLen 设置消息的长度
 func (m *Message) SetDataLen(datalen uint32) {
 	m.DataLen = datalen
 }

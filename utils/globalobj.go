@@ -21,6 +21,7 @@ type GlobalObj struct {
 	MaxConn        int    //当前服务器主机允许的最大连接数
 	MaxPackageSize uint32 //当前zinx框架数据包的最大值
 	MaxMsgChanLen  uint32 //SendBuffMsg发送消息的缓冲最大长度
+	UseHeartbeat   bool   //是否启用心跳检测
 }
 
 // 定义一个全局的对外GlobalObj

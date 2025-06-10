@@ -9,7 +9,7 @@ import (
 	"net"
 )
 
-// IServer的接口实现，定义一个Server的服务器模块
+// Server IServer的接口实现，定义一个Server的服务器模块
 type Server struct {
 	//服务器的名称
 	Name string
@@ -61,7 +61,7 @@ func (s *Server) Start() {
 			//设置最大连接个数的判断，如果超过最大连接，那么则关闭此新的连接
 			if s.ConnManager.Len() >= utils.GlobalObject.MaxConn {
 				utils.L.Error("too many conn", zap.Error(errors.New("用户过多")))
-				conn.Close()
+				_ = conn.Close()
 				continue
 			}
 			//将该处理新链接的业务方法和conn进行绑定，得到我们的连接模块
@@ -96,24 +96,24 @@ func (s *Server) GetConnMgr() ziface.IConnManager {
 	return s.ConnManager
 }
 
-// 注册OnConnStart钩子函数的方法
+// SetOnConnStart 注册OnConnStart钩子函数的方法
 func (s *Server) SetOnConnStart(hookFunc func(connection ziface.IConnection)) {
 	s.OnConnStart = hookFunc
 }
 
-// 注册OnConnStop钩子函数的方法
+// SetOnConnStop 注册OnConnStop钩子函数的方法
 func (s *Server) SetOnConnStop(hookFunc func(connection ziface.IConnection)) {
 	s.OnConnStop = hookFunc
 }
 
-// 调用OnConnStart钩子函数的方法
+// CallOnConnStart 调用OnConnStart钩子函数的方法
 func (s *Server) CallOnConnStart(conn ziface.IConnection) {
 	if s.OnConnStart != nil {
 		s.OnConnStart(conn)
 	}
 }
 
-// 调用OnConnStop钩子函数的方法
+// CallOnConnStop 调用OnConnStop钩子函数的方法
 func (s *Server) CallOnConnStop(conn ziface.IConnection) {
 	if s.OnConnStop != nil {
 		s.OnConnStop(conn)

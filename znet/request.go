@@ -9,12 +9,12 @@ type Request struct {
 	msg ziface.IMessage
 }
 
-// 得到当前连接
+// GetConnection 得到当前连接
 func (r *Request) GetConnection() ziface.IConnection {
 	return r.conn
 }
 
-// 得到请求的消息数据
+// GetData 得到请求的消息数据
 func (r *Request) GetData() []byte {
 	return r.msg.GetData()
 }

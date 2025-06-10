@@ -28,14 +28,15 @@ type Connection struct {
 	msgChan chan []byte
 	//有关冲管道，用于读、写两个goroutine之间的消息通信
 	msgBuffChan chan []byte
-
+	//当前心跳更新的时间
+	heartbeatTime time.Time
 	//链接属性
 	property map[string]interface{}
 	//保护链接属性修改的锁
 	propertyLock sync.RWMutex
 }
 
-// 创建连接的方法
+// NewConnection 创建连接的方法
 func NewConnection(server ziface.IServer, conn *net.TCPConn, connID uint32, msgHandler ziface.IMsgHandler) *Connection {
 	//初始化Conn属性
 	c := &Connection{
@@ -49,15 +50,12 @@ func NewConnection(server ziface.IServer, conn *net.TCPConn, connID uint32, msgH
 		msgBuffChan:  make(chan []byte, utils.GlobalObject.MaxMsgChanLen),
 		property:     make(map[string]interface{}),
 	}
-
 	//将新创建的Conn添加到链接管理中
 	c.TcpServer.GetConnMgr().Add(c)
 	return c
 }
 
-/*
-写消息Goroutine， 用户将数据发送给客户端
-*/
+// StartWriter 写消息Goroutine， 用户将数据发送给客户端
 func (c *Connection) StartWriter() {
 	for {
 		select {
@@ -83,9 +81,7 @@ func (c *Connection) StartWriter() {
 	}
 }
 
-/*
-读消息Goroutine，用于从客户端中读取数据
-*/
+// StartReader 启动读携程
 func (c *Connection) StartReader() {
 	utils.L.Info("Conn connect", zap.Uint32("id", 1))
 	defer c.Stop()
@@ -124,6 +120,9 @@ func (c *Connection) StartReader() {
 			msg:  msg,
 		}
 
+		// 更新当前连接的心跳状态
+		c.UpdateHeartbeat()
+
 		if utils.GlobalObject.WorkerPoolSize > 0 {
 			//已经启动工作池机制，将消息交给Worker处理
 			c.MsgHandler.SendMsgToTaskQueue(&req)
@@ -134,8 +133,30 @@ func (c *Connection) StartReader() {
 	}
 }
 
-// 启动连接，让当前连接开始工作
+// StartCheckHeartbeat 开始检查心跳，超过5分钟没有进行心跳更新的关闭连接
+func (c *Connection) StartCheckHeartbeat() {
+	for {
+		select {
+		case <-time.After(time.Second * 10):
+			c.propertyLock.RLock()
+			if time.Since(c.heartbeatTime) > time.Minute*5 {
+				// 长时间没有发送心跳包，断开连接
+				c.propertyLock.RUnlock()
+				c.Stop()
+				return
+			}
+			c.propertyLock.RUnlock()
+		}
+	}
+}
+
+// Start 启动连接，让当前连接开始工作
 func (c *Connection) Start() {
+	// 检查是否需要开启心跳检测
+	if utils.GlobalObject.UseHeartbeat {
+		c.heartbeatTime = time.Now()
+		go c.StartCheckHeartbeat()
+	}
 	//1 开启用户从客户端读取数据流程的Goroutine
 	go c.StartReader()
 	//2 开启用于写回客户端数据流程的Goroutine
@@ -144,7 +165,7 @@ func (c *Connection) Start() {
 	c.TcpServer.CallOnConnStart(c)
 }
 
-// 停止连接，结束当前连接状态M
+// Stop 停止连接，结束当前连接状态M
 func (c *Connection) Stop() {
 	utils.L.Info("Conn disconnect", zap.Uint32("id", 2))
 	//如果当前链接已经关闭
@@ -157,7 +178,7 @@ func (c *Connection) Stop() {
 	c.TcpServer.CallOnConnStop(c)
 
 	// 关闭socket链接
-	c.Conn.Close()
+	_ = c.Conn.Close()
 	//关闭Writer
 	c.ExitBuffChan <- true
 
@@ -169,22 +190,22 @@ func (c *Connection) Stop() {
 	close(c.msgBuffChan)
 }
 
-// 从当前连接获取原始的socket TCPConn
+// GetTCPConnection 从当前连接获取原始的socket TCPConn
 func (c *Connection) GetTCPConnection() *net.TCPConn {
 	return c.Conn
 }
 
-// 获取当前连接ID
+// GetConnID 获取当前连接ID
 func (c *Connection) GetConnID() uint32 {
 	return c.ConnID
 }
 
-// 获取远程客户端地址信息
+// RemoteAddr 获取远程客户端地址信息
 func (c *Connection) RemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
 }
 
-// 直接将Message数据发送数据给远程的TCP客户端
+// SendMsg 直接将Message数据发送数据给远程的TCP客户端
 func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	if c.isClosed == true {
 		return errors.New("Connection closed when send msg")
@@ -222,7 +243,7 @@ func (c *Connection) SendBuffMsg(msgId uint32, data []byte) error {
 	}
 }
 
-// 设置链接属性
+// SetProperty 设置链接属性
 func (c *Connection) SetProperty(key string, value interface{}) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
@@ -230,7 +251,7 @@ func (c *Connection) SetProperty(key string, value interface{}) {
 	c.property[key] = value
 }
 
-// 获取链接属性
+// GetProperty 获取链接属性
 func (c *Connection) GetProperty(key string) (interface{}, error) {
 	c.propertyLock.RLock()
 	defer c.propertyLock.RUnlock()
@@ -242,10 +263,17 @@ func (c *Connection) GetProperty(key string) (interface{}, error) {
 	}
 }
 
-// 移除链接属性
+// RemoveProperty 移除链接属性
 func (c *Connection) RemoveProperty(key string) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 
 	delete(c.property, key)
+}
+
+// UpdateHeartbeat 更新当前心跳状态
+func (c *Connection) UpdateHeartbeat() {
+	c.propertyLock.Lock()
+	c.heartbeatTime = time.Now()
+	c.propertyLock.Unlock()
 }

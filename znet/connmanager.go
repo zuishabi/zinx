@@ -7,20 +7,20 @@ import (
 	"sync"
 )
 
-// 链接管理模块
+// ConnManager 链接管理模块
 type ConnManager struct {
 	connections map[uint32]ziface.IConnection //管理的连接集合
 	connLock    sync.RWMutex                  //保护连接集合的读写锁
 }
 
-// 创建当前连接的方法
+// NewConnManager 创建当前连接的方法
 func NewConnManager() *ConnManager {
 	return &ConnManager{
 		connections: make(map[uint32]ziface.IConnection),
 	}
 }
 
-// 添加链接
+// Add 添加链接
 func (connMgr *ConnManager) Add(conn ziface.IConnection) {
 	//保护共享资源map，加写锁
 	connMgr.connLock.Lock()
@@ -29,7 +29,7 @@ func (connMgr *ConnManager) Add(conn ziface.IConnection) {
 	connMgr.connections[conn.GetConnID()] = conn
 }
 
-// 删除链接
+// Remove 删除链接
 func (connMgr *ConnManager) Remove(conn ziface.IConnection) {
 	//保护共享资源map，加写锁
 	connMgr.connLock.Lock()
@@ -38,7 +38,7 @@ func (connMgr *ConnManager) Remove(conn ziface.IConnection) {
 	delete(connMgr.connections, conn.GetConnID())
 }
 
-// 根据connID获取链接
+// Get 根据connID获取链接
 func (connMgr *ConnManager) Get(connID uint32) (ziface.IConnection, error) {
 	//保护共享资源map，加读锁
 	connMgr.connLock.RLock()
@@ -51,12 +51,12 @@ func (connMgr *ConnManager) Get(connID uint32) (ziface.IConnection, error) {
 	}
 }
 
-// 得到当前连接总数
+// Len 得到当前连接总数
 func (connMgr *ConnManager) Len() int {
 	return len(connMgr.connections)
 }
 
-// 清除并终止所有的连接
+// ClearConn 清除并终止所有的连接
 func (connMgr *ConnManager) ClearConn() {
 	//保护共享资源map，加写锁
 	connMgr.connLock.Lock()
